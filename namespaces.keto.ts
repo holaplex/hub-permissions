@@ -25,7 +25,6 @@ class Project implements Namespace {
 }
 
 class Organization implements Namespace {
-  // a test comment 
   related: {
     owners: User[]
     editors: User[]
