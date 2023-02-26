@@ -1,0 +1,13 @@
+dsn: memory
+version: v0.11.0-alpha.0
+log:
+  format: json
+  leak_sensitive_values: false
+  level: info
+namespaces:
+  location: file:///app/namespaces/
+serve:
+  read:
+    port: 4466
+  write:
+    port: 4467
