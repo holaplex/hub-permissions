@@ -32,23 +32,9 @@ jobs:
           -v $init_path/test/config.yaml:/etc/keto.yaml \
           -d oryd/keto:$image_tag  \
           -p 4466:4466 -p 4467:4467 \
-          300 > nohup.out 2> nohup.err < /dev/null &
-          
-          # wait for the container to be up
-          while [[ -z $(docker ps | grep keto) ]];do
-            echo waiting for container to go up
-            sleep 5
-          done
-
-          # alias for shorter docker commands
-          alias keto='docker exec keto keto --config /etc/keto.yaml'
-
-          # Run migrations
-          keto migrate up --yes --config /etc/keto.yaml 
-          # Validate namespace
-          keto namespace validate --config /etc/keto.yaml 
-          # Start Server
-          keto serve --config /etc/keto.yaml 
+          20 > nohup.out 2> nohup.err < /dev/null &
+          sleep 10
+          docker ps 
 
       - name: Run relations test
         run: |
