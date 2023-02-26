@@ -22,28 +22,25 @@ jobs:
           ns_file: namespaces.keto.ts
         run: |
           # Run migrations
-          docker run --network keto \
+          docker run --network keto --name keto \
           -v ${{ github.workspace }}/$ns_file:/app/namespaces \
           -v ${{ github.workspace }}/test/config.yaml:/etc/keto.yaml \
-          --network keto --name keto \
           -d oryd/keto:$image_tag  \
           oryd/keto --config /etc/keto.yaml \
           migrate up --yes
 
           # Validate namespace
-          docker run --network keto \
+          docker run --network keto --name keto\
           -v ${{ github.workspace }}/$ns_file:/app/namespaces \
           -v ${{ github.workspace }}/test/config.yaml:/etc/keto.yaml \
-          --network keto --name keto \
           -d oryd/keto:$image_tag  \
           oryd/keto --config /etc/keto.yaml \
           namespace validate
 
           # Start Server
-          docker run --network keto \
+          docker run --network keto --name keto\
           -v ${{ github.workspace }}/$ns_file:/app/namespaces \
           -v ${{ github.workspace }}/test/config.yaml:/etc/keto.yaml \
-          --network keto --name keto \
           -d oryd/keto:$image_tag  \
           oryd/keto --config /etc/keto.yaml \
           serve
