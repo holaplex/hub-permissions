@@ -15,7 +15,7 @@ jobs:
       - name: Encode Keto policy
         id: encode-policy
         run: |
-          encoded=$(cat namespaces.keto.ts | base64)
+          encoded=$(base64 -i namespaces.keto.ts)
           echo "POLICY=$encoded" >> $GITHUB_OUTPUT
 
       - name: Invoke workflow in hub-kubes repo
