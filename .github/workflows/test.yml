@@ -1,9 +1,5 @@
 name: Keto relations test
-on:
-  push:
-    branches:
-      - 'mpw/add-tests'
-#on: [push, pull_request]
+on: [push, pull_request]
 
 jobs:
   test:
@@ -22,6 +18,7 @@ jobs:
           ns_file: namespaces.keto.ts
         run: |
           init_path=$(pwd)
+
           # Init container
           nohup docker run --network keto --name keto \
           --entrypoint '/bin/sleep' \
