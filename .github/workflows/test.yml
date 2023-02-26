@@ -46,8 +46,7 @@ jobs:
 
           # Run migrations
           keto migrate up --yes
-          # Validate namespace
-          keto namespace validate
+
           # Start Server
           keto serve
 
