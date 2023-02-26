@@ -22,6 +22,7 @@ jobs:
           ns_file: namespaces.keto.ts
         run: |
           #More setup
+          shopt -s expand_aliases
           init_path=$(pwd)
           alias keto='(
           docker start --network keto --name keto \
