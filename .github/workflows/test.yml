@@ -1,9 +1,6 @@
-name: Keto relations test
-on:
-  push:
-    branches:
-      - 'mpw/add-tests'
-#on: [push, pull_request]
+name: Keto relations tests
+
+on: [push, pull_request]
 
 jobs:
   test:
@@ -25,7 +22,7 @@ jobs:
           shopt -s expand_aliases
           init_path=$(pwd)
 
-          # Init container
+          # Init container and sleep for 300 seconds
           nohup docker run --network keto --name keto \
           --entrypoint '/bin/sleep' \
           -v $init_path/$ns_file:/app/namespaces/$ns_file \
