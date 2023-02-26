@@ -24,28 +24,31 @@ jobs:
           #More setup
           shopt -s expand_aliases
           init_path=$(pwd)
-          # Init container, run migrations and wait for the tests to run
+
+          # Init container
           nohup docker run --network keto --name keto \
+          --entrypoint '/bin/sleep' \
           -v $init_path/$ns_file:/app/namespaces \
           -v $init_path/test/config.yaml:/etc/keto.yaml \
           -d oryd/keto:$image_tag  \
           -p 4466:4466 -p 4467:4467 \
-          oryd/keto "keto --config /etc/keto.yaml migrate up --yes && sleep 180" \
-          > nohup.out 2> nohup.err < /dev/null &
+          300 > nohup.out 2> nohup.err < /dev/null &
           
           # wait for the container to be up
           while [[ -z $(docker ps | grep keto) ]];do
             echo waiting for container to go up
-            sleep 2
+            sleep 5
           done
 
           # alias for shorter docker commands
           alias keto='docker exec keto keto --config /etc/keto.yaml'
 
+          # Run migrations
+          keto migrate up --yes --config /etc/keto.yaml 
           # Validate namespace
-          keto namespace validate
+          keto namespace validate --config /etc/keto.yaml 
           # Start Server
-          keto serve
+          keto serve --config /etc/keto.yaml 
 
       - name: Run relations test
         run: |
