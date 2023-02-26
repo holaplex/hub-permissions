@@ -26,15 +26,18 @@ jobs:
           init_path=$(pwd)
 
           # Init container
-          nohup docker run --network keto --name keto \
+          docker run --network keto --name keto \
           --entrypoint '/bin/sleep' \
           -v $init_path/$ns_file:/app/namespaces \
           -v $init_path/test/config.yaml:/etc/keto.yaml \
           -d oryd/keto:$image_tag  \
           -p 4466:4466 -p 4467:4467 \
-          20 > nohup.out 2> nohup.err < /dev/null &
+          30 &
+          echo 'sleeping'
           sleep 10
           docker ps 
+          docker ps -a
+          docker logs keto
 
       - name: Run relations test
         run: |
