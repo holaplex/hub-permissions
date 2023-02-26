@@ -17,9 +17,11 @@ jobs:
           image_tag: v0.11.0-alpha.0
           ns_file: namespaces.keto.ts
         run: |
+          # More setup
           init_path=$(pwd)
+          shopt -s expand_aliases
 
-          # Init container
+          # Init container and sleep for 300 seconds
           nohup docker run --network keto --name keto \
           --entrypoint '/bin/sleep' \
           -v $init_path/$ns_file:/app/namespaces/$ns_file \
