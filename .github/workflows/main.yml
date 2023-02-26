@@ -1,0 +1,27 @@
+name: Release Policy
+on:
+  push:
+    branches:
+      - 'mpw/opl-setup'
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    environment: release
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      
+      - name: Encode Keto policy
+        id: encode-policy
+        run: |
+          echo "POLICY=$(base64 -w0 -i namespaces.keto.ts)" >> $GITHUB_OUTPUT
+
+      - name: Invoke workflow in hub-kubes repo
+        uses: benc-uk/workflow-dispatch@v1
+        with:
+          ref: main
+          token: ${{ secrets.ACTIONS_TOKEN }}
+          workflow: keto.yml
+          repo: holaplex/hub-kubes
+          inputs: '{ "policy": "${{ steps.encode-policy.outputs.POLICY}}", "environment": "stage", "commit_hash": "${{ github.sha }}"}'
