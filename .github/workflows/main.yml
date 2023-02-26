@@ -15,10 +15,8 @@ jobs:
       - name: Encode Keto policy
         id: encode-policy
         run: |
-          EOF=$(dd if=/dev/urandom bs=15 count=1 status=none | base64)
-          echo "POLICY<<$EOF" >> $GITHUB_OUTPUT
-          cat namespaces.keto.ts | base64 >> $GITHUB_OUTPUT
-          echo "$EOF" >> $GITHUB_OUTPUT
+          encoded=$(cat namespaces.keto.ts | base64)
+          echo "POLICY=$encoded" >> $GITHUB_OUTPUT
 
       - name: Invoke workflow in hub-kubes repo
         uses: benc-uk/workflow-dispatch@v1
