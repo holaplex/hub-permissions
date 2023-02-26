@@ -48,7 +48,7 @@ jobs:
           keto migrate up --yes
 
           # Start Server
-          keto serve > nohup2.out 2> nohup2.err < /dev/null &
+          keto serve &
 
       - name: Run relations test
         run: |
