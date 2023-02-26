@@ -2,7 +2,7 @@ name: Release Policy
 on:
   push:
     branches:
-      - 'mpw/opl-setup'
+      - main
 
 jobs:
   release:
