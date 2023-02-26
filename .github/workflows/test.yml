@@ -30,8 +30,8 @@ jobs:
           -v $init_path/test/config.yaml:/etc/keto.yaml \
           -d oryd/keto:$image_tag  \
           -p 4466:4466 -p 4467:4467 \
-          oryd/keto keto --config /etc/keto.yaml migrate up --yes \
-          && sleep 180 > nohup.out 2> nohup.err < /dev/null &
+          oryd/keto "keto --config /etc/keto.yaml migrate up --yes && sleep 180" \
+          > nohup.out 2> nohup.err < /dev/null &
           
           # wait for the container to be up
           while [[ -z $(docker ps | grep keto) ]];do
