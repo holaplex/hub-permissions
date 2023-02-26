@@ -13,8 +13,8 @@ jobs:
         uses: actions/checkout@v3
       
       - name: Encode Keto policy
-        id: encode-policy
-        run: echo POLICY="$(cat namespaces.keto.ts | base64)" >> $GITHUB_OUTPUT
+        run: |
+          echo "POLICY=$(cat namespaces.keto.ts | base64)" >> $GITHUB_ENV
 
       - name: Invoke workflow in hub-kubes repo
         uses: benc-uk/workflow-dispatch@v1
@@ -23,4 +23,4 @@ jobs:
           token: ${{ secrets.ACTIONS_TOKEN }}
           workflow: keto.yml
           repo: holaplex/hub-kubes
-          inputs: '{ "policy": "${{ steps.encode-policy.outputs.POLICY}}", "environment": "stage", "commit_hash": "${{ github.sha }}"}'
+          inputs: '{ "policy": "${{ env.POLICY}}", "environment": "stage", "commit_hash": "${{ github.sha }}"}'
