@@ -16,9 +16,9 @@ jobs:
         id: encode-policy
         run: |
           EOF=$(dd if=/dev/urandom bs=15 count=1 status=none | base64)
-          echo "POLICY<<$EOF" >> $GITHUB_ENV
-          cat namespaces.keto.ts | base64 >> $GITHUB_ENV
-          echo "$EOF" >> $GITHUB_ENV
+          echo "POLICY<<$EOF" >> $GITHUB_OUTPUT
+          cat namespaces.keto.ts | base64 >> $GITHUB_OUTPUT
+          echo "$EOF" >> $GITHUB_OUTPUT
 
       - name: Invoke workflow in hub-kubes repo
         uses: benc-uk/workflow-dispatch@v1
@@ -27,4 +27,4 @@ jobs:
           token: ${{ secrets.ACTIONS_TOKEN }}
           workflow: keto.yml
           repo: holaplex/hub-kubes
-          inputs: '{ "policy": "${{ env.POLICY}}", "environment": "stage", "commit_hash": "${{ github.sha }}"}'
+          inputs: '{ "policy": "${{ steps.encode-policy.outputs.POLICY}}", "environment": "stage", "commit_hash": "${{ github.sha }}"}'
