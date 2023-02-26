@@ -29,7 +29,7 @@ jobs:
           -v $init_path/test/config.yaml:/etc/keto.yaml \
           -d oryd/keto:$image_tag  \
           oryd/keto --config /etc/keto.yaml
-          )
+          )'
           # Run migrations
           keto migrate up --yes
 
