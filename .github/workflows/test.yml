@@ -21,12 +21,12 @@ jobs:
           image_tag: v0.11.0-alpha.0
           ns_file: namespaces.keto.ts
         run: |
-          pwd
-          ls
+          #More setup
+          init_path=$(pwd)
           alias keto='(
           docker start --network keto --name keto \
-          -v $ns_file:/app/namespaces \
-          -v test/config.yaml:/etc/keto.yaml \
+          -v $init_path/$ns_file:/app/namespaces \
+          -v $init_path/test/config.yaml:/etc/keto.yaml \
           -d oryd/keto:$image_tag  \
           oryd/keto --config /etc/keto.yaml
           )
