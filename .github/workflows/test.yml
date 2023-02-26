@@ -29,16 +29,16 @@ jobs:
           -v $init_path/$ns_file:/app/namespaces \
           -v $init_path/test/config.yaml:/etc/keto.yaml \
           -d oryd/keto:$image_tag  \
-          oryd/keto --config /etc/keto.yaml
+          oryd/keto
           )'
           # Run migrations
-          keto migrate up --yes
+          keto migrate up --yes --config /etc/keto.yaml
 
           # Validate namespace
-          keto namespace validate
+          keto namespace validate --config /etc/keto.yaml
 
           # Start Server
-          keto serve
+          keto serve --config /etc/keto.yaml
 
       - name: Run relations test
         run: |
