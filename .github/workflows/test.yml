@@ -17,7 +17,9 @@ jobs:
           image_tag: v0.11.0-alpha.0
           ns_file: namespaces.keto.ts
         run: |
+          # More setup
           init_path=$(pwd)
+          shopt -s expand_aliases
 
           # Init container
           nohup docker run --network keto --name keto \
