@@ -25,7 +25,7 @@ jobs:
           init_path=$(pwd)
 
           function keto() {
-            docker start --network keto --name keto \
+            docker run --network keto --name keto \
             -v $init_path/$ns_file:/app/namespaces \
             -v $init_path/test/config.yaml:/etc/keto.yaml \
             -d oryd/keto:$image_tag  \
