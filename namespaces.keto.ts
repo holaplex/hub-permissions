@@ -40,7 +40,7 @@ class Organization implements Namespace {
       this.related.editors.includes(ctx.subject) ||
       this.permits.delete(ctx),
     invite: (ctx: Context): boolean =>
-      this.permits.delete(ctx),
+      this.permits.view(ctx),
     delete: (ctx: Context): boolean =>
       this.related.owners.includes(ctx.subject) || 
       this.related.parents.traverse((parent) => parent.permits.delete(ctx)),
