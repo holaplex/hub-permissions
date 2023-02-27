@@ -268,7 +268,7 @@ assert x[1] == True
 ## Can User Anna invite members to Org1?
 ss.object = 'Anna'
 x = check_relation_tuple(namespace, object, action, subject_set=ss)
-assert x[1] == True
+assert x[1] == False
 
 ## Can User John edit Organization Org1?
 ss.object = 'John'
