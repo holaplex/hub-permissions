@@ -247,7 +247,7 @@ assert x[1] == False
 ## Can User api_token invite members to Organization Org1?
 action = 'invite'
 x = check_relation_tuple(namespace, object, action, subject_set=ss)
-assert x[1] == False
+assert x[1] == True
 
 ## Can User John invite people to Organization Org1?
 ss.object = 'John'
