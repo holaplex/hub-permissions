@@ -298,7 +298,6 @@ x = check_relation_tuple(namespace, object, action, subject_set=ss)
 assert x[1] == False 
 
 ## Can User Alice delete Organization JohnOrg?
-ss.object = 'Alice'
 action = 'delete'
 x = check_relation_tuple(namespace, object, action, subject_set=ss)
 assert x[1] == False
@@ -367,6 +366,7 @@ print('------------------------------')
 ss = SubjectSet(
     namespace='User',
     object='Bob',
+    relation='session',
 )
 relation = 'owners'
 namespace = "Organization"
@@ -384,4 +384,3 @@ namespace = "Project"
 object = "Project1"
 x = check_relation_tuple(namespace, object, action, subject_set=ss)
 assert x[1] == True
-
