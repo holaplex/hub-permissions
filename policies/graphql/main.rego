@@ -9,12 +9,9 @@ import data.hub.graphql.lib.mutation_fields
 import data.hub.graphql.lib.mutation_arguments
 import data.hub.graphql.lib.valid_schema
 import data.hub.graphql.lib.valid_query
-import data.hub.graphql.lib.query_types
-import data.hub.graphql.lib.ast
 import data.hub.utils.keto.check_relation
-import input.keto
-import data.allowed_operations
 import future.keywords.if
+import input.keto
 
 default allow := false
 
@@ -23,7 +20,7 @@ action := "edit" if input.graphql.operation == "mutation"
 
 
 skip_authz {
-  data.no_authz_inputs[_] == mutation_definitions[_].SelectionSet[_].Name
+  data.no_authz_inputs[_] == mutation_definitions[_].VariableDefinitions[_].Type.NamedType
 }
 
 skip_authz {
@@ -53,7 +50,6 @@ reason := {
     "fields": mutation_fields,
     "arguments": mutation_arguments,
     },
-  "types": query_types,
   "query": { 
     "definitions": query_definitions, 
     "fields": query_fields,

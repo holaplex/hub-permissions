@@ -1,5 +1,5 @@
 {
-  "no_authz_inputs": ["createOrganizationInput"],
+  "no_authz_inputs": ["CreateOrganizationInput"],
   "mappings": [
     {
       "namespace": "Organization",
@@ -15,9 +15,9 @@
       "namespace": "Project",
       "inputs": [
         "project",
-        "CreateCredentialInput",
         "CreateCustomerInput",
-        "CreateDropInput"
+        "CreateDropInput",
+        "CreateTreasuryWalletInput"
       ]
     }
   ],
