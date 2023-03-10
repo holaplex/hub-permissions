@@ -1,0 +1,24 @@
+[[schemas]]
+subject = "credential"
+version = 1
+sha512 = "388fa5003f35dae03f41a35443110de8ec8792fac9326d360aef42d88862f77f04449f91e326acd8e5fb61cfbb7477a35d4b7c128b758e1a9eae7f1874431c04"
+
+[[schemas]]
+subject = "customer"
+version = 1
+sha512 = "e91f3aa8f20639973deb1ca131c2342b53c802807a52ea40f4f54c3ab7c79158f969cd42a3f3925760941f113270a4549d8d7378e578f9fe5ef6abb09e05848a"
+
+[[schemas]]
+subject = "nfts"
+version = 1
+sha512 = "9519d5eb119485f471e569ad06cf6ce4a0e9f618b9cd15de96af19ee14d753d664fa746e822ef967b1ed88c769823f856ac34450b65f641b1cd1c043a948de73"
+
+[[schemas]]
+subject = "organization"
+version = 2
+sha512 = "82c5607ddc093c66806f86fad7c5de04236beff9d6a14a1c58d4c0b0c26a8aaef021e21efa81ce84936cc1ccd8385093639d13885f7a5bb0555f635181ecf582"
+
+[[schemas]]
+subject = "treasury"
+version = 1
+sha512 = "6961f0b9a85e2f36676111643d329c325f49929deabb1bdc7579395b1b59ca1be10904218d9fef2b74d85976aa1afa1029eb2212d0b8a8e851920cd4afe6934f"

@@ -1,0 +1,33 @@
+[package]
+name = "holaplex-hub-permissions"
+version = "0.1.0"
+authors = ["Holaplex <engineering@holaplex.com>"]
+edition = "2021"
+description = "Holaplex Hub permissions service"
+readme = "./README.md"
+repository = "https://github.com/holaplex/hub-permissions"
+license = "AGPL-3.0-or-later"
+keywords = ["hub", "holaplex", "web3"]
+categories = ["cryptography::cryptocurrencies", "web-programming"]
+
+build = "build.rs"
+
+[dependencies]
+ory-keto-client = "0.11.0-alpha.0"
+reqwest = "0.11.14"
+serde = { version = "1.0.152", features = ["derive"] }
+serde_json = { version = "1.0.91" }
+prost = "0.11.6"
+
+[dependencies.hub-core]
+package = "holaplex-hub-core"
+version = "0.1.0"
+git = "https://github.com/holaplex/hub-core"
+branch = "stable"
+features = ["kafka"]
+
+[build-dependencies.hub-core-build]
+package = "holaplex-hub-core-build"
+version = "0.1.0"
+git = "https://github.com/holaplex/hub-core"
+branch = "stable"
