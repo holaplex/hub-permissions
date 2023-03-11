@@ -20,13 +20,20 @@ action := "edit" if input.graphql.operation == "mutation"
 
 
 skip_authz {
+  ## Skip if mutation found in data.no_authz_inputs
   data.no_authz_inputs[_] == mutation_definitions[_].VariableDefinitions[_].Type.NamedType
+}
+
+skip_authz {
+  ## Skip if query found in data.no_authz_inputs
+  data.no_authz_inputs[_] == query_definitions[_].SelectionSet[_].Name
 }
 
 skip_authz {
   ## subject is querying itself
   keto.subject_set.object == input.graphql.variables[query_arguments.user.id]
 }
+
 
 valid_graphql {
   valid_schema
