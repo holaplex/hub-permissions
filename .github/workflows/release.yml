@@ -1,0 +1,50 @@
+name: Release Image
+on:
+  push:
+    branches:
+      - main
+jobs:
+  release:
+    runs-on: self-hosted
+    environment: release
+    steps:
+      -
+        name: Checkout
+        uses: actions/checkout@v3
+      -
+        name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ vars.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - 
+        run: docker context create mycontext
+      - 
+        run: docker context use mycontext 
+      - 
+        name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+        with:
+          buildkitd-flags: --debug
+          version: v0.9.1
+          endpoint: mycontext
+      -
+        name: Build and push ${{ github.event.repository.name }}
+        uses: docker/build-push-action@v3
+        with:
+          context: .
+          file: ./Dockerfile
+          target: ${{ github.event.repository.name }}
+          push: true
+          tags: ${{ vars.DOCKERHUB_ORG }}/${{ github.event.repository.name }}:${{ github.sha }},${{ vars.DOCKERHUB_ORG }}/${{ github.event.repository.name }}:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+      - 
+        name: Invoke workflow in hub-kubes repo
+        uses: benc-uk/workflow-dispatch@v1
+        with:
+          ref: main
+          token: ${{ secrets.ACTIONS_TOKEN }}
+          workflow: release.yml
+          repo: holaplex/hub-kubes
+          inputs: '{ "service": "permissions", "environment": "stage", "commit_hash": "${{ github.sha }}"}'

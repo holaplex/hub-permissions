@@ -1,0 +1,35 @@
+version: "3"
+services:
+  keto:
+    image: oryd/keto:v0.11.1-alpha.0
+    ports:
+      - "4466:4466"
+      - "4467:4467"
+    command: serve -c /home/ory/keto.yml
+    restart: on-failure
+    environment:
+      - NAMESPACES_LOCATION=file:///home/ory/namespaces.keto.ts
+    volumes:
+      - type: bind
+        source: config/keto.yml
+        target: /home/ory/keto.yml
+      - type: bind
+        source: ./namespaces.keto.ts
+        target: /home/ory/namespaces.keto.ts
+  redpanda:
+    image: redpandadata/redpanda:v23.1.1
+    command:
+      - redpanda start
+      - --smp 1
+      - --overprovisioned
+      - --node-id 0
+      - --kafka-addr PLAINTEXT://0.0.0.0:29092,OUTSIDE://0.0.0.0:9092
+      - --advertise-kafka-addr PLAINTEXT://redpanda:29092,OUTSIDE://localhost:9092
+      - --pandaproxy-addr 0.0.0.0:8082
+      - --advertise-pandaproxy-addr localhost:8082
+    ports:
+      - 8081:8081
+      - 8082:8082
+      - 9092:9092
+      - 9644:9644
+      - 29092:29092
