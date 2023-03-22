@@ -105,10 +105,7 @@ async fn process_oauth2_client_created_event(
     Ok(())
 }
 
-async fn process_project_created_event(
-    keto: Configuration,
-    payload: Project,
-) -> Result<()> {
+async fn process_project_created_event(keto: Configuration, payload: Project) -> Result<()> {
     let relation = create_relationship(
         &keto,
         Some(&CreateRelationshipBody {
