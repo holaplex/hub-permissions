@@ -25,7 +25,7 @@ pub async fn process(msg: Services, keto: Configuration) -> Result<()> {
                 process_org_created_event(keto, k).await
             },
             Some(organization_events::Event::ProjectCreated(payload)) => {
-                process_project_created_event(keto, k, payload).await
+                process_project_created_event(keto, payload).await
             },
             Some(organization_events::Event::MemberAdded(payload)) => {
                 process_member_added_event(keto, k, payload).await
@@ -107,7 +107,6 @@ async fn process_oauth2_client_created_event(
 
 async fn process_project_created_event(
     keto: Configuration,
-    key: OrganizationEventKey,
     payload: Project,
 ) -> Result<()> {
     let relation = create_relationship(
@@ -118,7 +117,7 @@ async fn process_project_created_event(
             relation: Some("parents".to_string()),
             subject_id: None,
             subject_set: Some(Box::new(SubjectSet {
-                object: key.id.to_string(),
+                object: payload.organization_id.to_string(),
                 namespace: "Organization".to_string(),
                 relation: String::default(),
             })),
