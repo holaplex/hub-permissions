@@ -6,9 +6,9 @@ use ory_keto_client::{
 
 use crate::{
     proto::{
-        credential_events, organization_events,
-        treasury_events::{self, DropCreated},
-        CredentialEventKey, Member, OAuth2Client, OrganizationEventKey, Project, TreasuryEventKey,
+        credential_events, customer_events, organization_events, treasury_events,
+        CredentialEventKey, Customer, CustomerEventKey, Member, OAuth2Client, OrganizationEventKey,
+        Project, TreasuryEventKey,
     },
     Services,
 };
@@ -28,9 +28,16 @@ pub async fn process(msg: Services, keto: Configuration) -> Result<()> {
                 process_project_created_event(keto, k, payload).await
             },
             Some(organization_events::Event::MemberAdded(payload)) => {
-                process_member_added_event(keto, payload).await
+                process_member_added_event(keto, k, payload).await
             },
             Some(_) | None => Ok(()),
+        },
+
+        Services::Customers(k, e) => match e.event {
+            Some(customer_events::Event::Created(payload)) => {
+                process_customer_added_event(keto, k, payload).await
+            },
+            None => Ok(()),
         },
 
         Services::Treasuries(k, e) => match e.event {
@@ -71,6 +78,7 @@ async fn process_org_created_event(keto: Configuration, key: OrganizationEventKe
     Ok(())
 }
 
+// TODO: Check if this relationship is needed
 async fn process_oauth2_client_created_event(
     keto: Configuration,
     key: CredentialEventKey,
@@ -126,7 +134,7 @@ async fn process_project_created_event(
 async fn process_drop_created_event(
     keto: Configuration,
     key: TreasuryEventKey,
-    payload: DropCreated,
+    payload: treasury_events::DropCreated,
 ) -> Result<()> {
     let relation = create_relationship(
         &keto,
@@ -149,7 +157,11 @@ async fn process_drop_created_event(
     Ok(())
 }
 
-async fn process_member_added_event(keto: Configuration, payload: Member) -> Result<()> {
+async fn process_member_added_event(
+    keto: Configuration,
+    key: OrganizationEventKey,
+    payload: Member,
+) -> Result<()> {
     let relation = create_relationship(
         &keto,
         Some(&CreateRelationshipBody {
@@ -158,8 +170,34 @@ async fn process_member_added_event(keto: Configuration, payload: Member) -> Res
             relation: Some("editors".to_string()),
             subject_id: None,
             subject_set: Some(Box::new(SubjectSet {
-                object: payload.user_id.to_string(),
+                object: key.user_id.to_string(),
                 namespace: "User".to_string(),
+                relation: String::default(),
+            })),
+        }),
+    )
+    .await?;
+
+    info!("relation created {:?}", relation);
+
+    Ok(())
+}
+
+async fn process_customer_added_event(
+    keto: Configuration,
+    key: CustomerEventKey,
+    payload: Customer,
+) -> Result<()> {
+    let relation = create_relationship(
+        &keto,
+        Some(&CreateRelationshipBody {
+            namespace: Some("Customer".to_string()),
+            object: Some(key.id.to_string()),
+            relation: Some("parents".to_string()),
+            subject_id: None,
+            subject_set: Some(Box::new(SubjectSet {
+                object: payload.project_id.to_string(),
+                namespace: "Project".to_string(),
                 relation: String::default(),
             })),
         }),

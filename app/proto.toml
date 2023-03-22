@@ -1,9 +1,9 @@
 [registry]
-endpoint = "http://localhost:8081"
+endpoint = "https://schemas.holaplex.tools"
 
 [schemas]
 organization = 2
 nfts = 1
 customer = 1
-treasury = 1
+treasury = 4
 credential = 1
