@@ -1,6 +1,9 @@
 use hub_core::prelude::*;
 use ory_keto_client::{
-    apis::{configuration::Configuration, relationship_api::create_relationship},
+    apis::{
+        configuration::Configuration,
+        relationship_api::{create_relationship, delete_relationships},
+    },
     models::{CreateRelationshipBody, SubjectSet},
 };
 
@@ -47,14 +50,20 @@ pub async fn process(msg: Services, keto: Configuration) -> Result<()> {
             Some(_) | None => Ok(()),
         },
         Services::Credentials(key, payload) => match payload.event {
-            Some(credential_events::Event::Oauth2ClientCreated(c)) => {
-                process_oauth2_client_created_event(keto, key, c).await
+            Some(credential_events::Event::Oauth2ClientCreated(payload)) => {
+                process_oauth2_client_created_event(keto, key, payload).await
+            },
+            Some(credential_events::Event::Oauth2ClientDeleted(payload)) => {
+                process_oauth2_client_deleted_event(keto, key, payload).await
             },
             None => Ok(()),
         },
         Services::Webhooks(key, payload) => match payload.event {
-            Some(webhook_events::Event::Created(c)) => {
-                process_webhooks_created_event(keto, key, c).await
+            Some(webhook_events::Event::Created(payload)) => {
+                process_webhooks_created_event(keto, key, payload).await
+            },
+            Some(webhook_events::Event::Deleted(payload)) => {
+                process_webhook_deleted_event(keto, key, payload).await
             },
             None => Ok(()),
         },
@@ -83,7 +92,6 @@ async fn process_org_created_event(keto: Configuration, key: OrganizationEventKe
     Ok(())
 }
 
-// TODO: Check if this relationship is needed
 async fn process_oauth2_client_created_event(
     keto: Configuration,
     key: CredentialEventKey,
@@ -94,12 +102,12 @@ async fn process_oauth2_client_created_event(
         Some(&CreateRelationshipBody {
             namespace: Some("Organization".to_string()),
             object: Some(payload.organization.to_string()),
-            relation: Some("owners".to_string()),
+            relation: Some("editors".to_string()),
             subject_id: None,
             subject_set: Some(Box::new(SubjectSet {
                 object: key.id.to_string(),
                 namespace: "User".to_string(),
-                relation: "session".to_string(),
+                relation: String::default(),
             })),
         }),
     )
@@ -108,6 +116,25 @@ async fn process_oauth2_client_created_event(
     info!("relation created {:?}", relation);
 
     Ok(())
+}
+
+async fn process_oauth2_client_deleted_event(
+    keto: Configuration,
+    key: CredentialEventKey,
+    payload: OAuth2Client,
+) -> Result<()> {
+    delete_relationships(
+        &keto,
+        Some("Organization"),
+        Some(&payload.organization),
+        Some("editors"),
+        None,
+        Some("User"),
+        Some(&key.id),
+        Some(""),
+    )
+    .await
+    .map_err(Into::into)
 }
 
 async fn process_project_created_event(keto: Configuration, payload: Project) -> Result<()> {
@@ -234,4 +261,23 @@ async fn process_webhooks_created_event(
     info!("relation created {:?}", relation);
 
     Ok(())
+}
+
+async fn process_webhook_deleted_event(
+    keto: Configuration,
+    key: WebhookEventKey,
+    payload: Webhook,
+) -> Result<()> {
+    delete_relationships(
+        &keto,
+        Some("Webhook"),
+        Some(&key.id),
+        Some("parents"),
+        None,
+        Some("Organization"),
+        Some(&payload.organization_id),
+        Some(""),
+    )
+    .await
+    .map_err(Into::into)
 }
