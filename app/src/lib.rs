@@ -12,6 +12,7 @@ pub mod proto {
     include!(concat!(env!("OUT_DIR"), "/customer.proto.rs"));
     include!(concat!(env!("OUT_DIR"), "/treasury.proto.rs"));
     include!(concat!(env!("OUT_DIR"), "/credential.proto.rs"));
+    include!(concat!(env!("OUT_DIR"), "/webhook.proto.rs"));
 }
 
 #[derive(Debug)]
@@ -20,6 +21,7 @@ pub enum Services {
     Customers(proto::CustomerEventKey, proto::CustomerEvents),
     Treasuries(proto::TreasuryEventKey, proto::TreasuryEvents),
     Credentials(proto::CredentialEventKey, proto::CredentialEvents),
+    Webhooks(proto::WebhookEventKey, proto::WebhookEvents),
 }
 
 impl hub_core::consumer::MessageGroup for Services {
@@ -28,6 +30,7 @@ impl hub_core::consumer::MessageGroup for Services {
         "hub-customers",
         "hub-treasuries",
         "hub-credentials",
+        "hub-webhooks",
     ];
 
     fn from_message<M: hub_core::consumer::Message>(msg: &M) -> Result<Self, RecvError> {
@@ -60,6 +63,12 @@ impl hub_core::consumer::MessageGroup for Services {
                 let val = proto::CredentialEvents::decode(val)?;
 
                 Ok(Services::Credentials(key, val))
+            },
+            "hub-webhooks" => {
+                let key = proto::WebhookEventKey::decode(key)?;
+                let val = proto::WebhookEvents::decode(val)?;
+
+                Ok(Services::Webhooks(key, val))
             },
             t => Err(RecvError::BadTopic(t.into())),
         }

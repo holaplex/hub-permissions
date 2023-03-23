@@ -6,9 +6,9 @@ use ory_keto_client::{
 
 use crate::{
     proto::{
-        credential_events, customer_events, organization_events, treasury_events,
+        credential_events, customer_events, organization_events, treasury_events, webhook_events,
         CredentialEventKey, Customer, CustomerEventKey, Member, OAuth2Client, OrganizationEventKey,
-        Project, TreasuryEventKey,
+        Project, TreasuryEventKey, Webhook, WebhookEventKey,
     },
     Services,
 };
@@ -52,7 +52,12 @@ pub async fn process(msg: Services, keto: Configuration) -> Result<()> {
             },
             None => Ok(()),
         },
-        _ => Ok(()),
+        Services::Webhooks(key, payload) => match payload.event {
+            Some(webhook_events::Event::Created(c)) => {
+                process_webhooks_created_event(keto, key, c).await
+            },
+            None => Ok(()),
+        },
     }
 }
 
@@ -194,6 +199,32 @@ async fn process_customer_added_event(
             subject_set: Some(Box::new(SubjectSet {
                 object: payload.project_id.to_string(),
                 namespace: "Project".to_string(),
+                relation: String::default(),
+            })),
+        }),
+    )
+    .await?;
+
+    info!("relation created {:?}", relation);
+
+    Ok(())
+}
+
+async fn process_webhooks_created_event(
+    keto: Configuration,
+    key: WebhookEventKey,
+    payload: Webhook,
+) -> Result<()> {
+    let relation = create_relationship(
+        &keto,
+        Some(&CreateRelationshipBody {
+            namespace: Some("Webhook".to_string()),
+            object: Some(key.id.to_string()),
+            relation: Some("parents".to_string()),
+            subject_id: None,
+            subject_set: Some(Box::new(SubjectSet {
+                object: payload.organization_id.to_string(),
+                namespace: "Organization".to_string(),
                 relation: String::default(),
             })),
         }),
