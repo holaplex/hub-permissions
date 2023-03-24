@@ -10,14 +10,24 @@ import data.hub.graphql.lib.mutation_arguments
 import data.hub.graphql.lib.valid_schema
 import data.hub.graphql.lib.valid_query
 import data.hub.utils.keto.check_relation
+import input.request.headers as http_headers
 import future.keywords.if
-import input.keto
 
 default allow := false
 
 default action := "view"
 action := "edit" if input.graphql.operation == "mutation"
 
+
+headers = {lower(k): v | http_headers[_]; v := http_headers[k]}
+
+get_subject_id() := id {
+  id := headers["x-client-id"]
+} else := id {
+  id := headers["x-user-id"]
+}
+
+subject_id := get_subject_id()
 
 skip_authz {
   ## Skip if mutation found in data.no_authz_inputs
@@ -31,26 +41,19 @@ skip_authz {
 
 skip_authz {
   ## subject is querying itself
-  keto.subject_set.object == input.graphql.variables[query_arguments.user.id]
+  subject_id == input.graphql.variables[query_arguments.user.id]
 }
 
-
-valid_graphql {
-  valid_schema
-  valid_query
-}
-
-keto_allowed if check_relation(keto, action) == true
+keto_allowed if check_relation(subject_id, action) == true
 keto_allowed if skip_authz
 
 allow {
-  valid_graphql
   keto_allowed
 }
 
 reason := { 
-  "keto": keto,
-  "headers": input.request.headers,
+  "headers": headers,
+  "subject_id": subject_id,
   "graphql": input.graphql,
   "mutation": { 
     "definitions": mutation_definitions,
