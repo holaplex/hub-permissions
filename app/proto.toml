@@ -6,5 +6,5 @@ organization = 2
 nfts = 1
 customer = 1
 treasury = 4
-credential = 1
-webhook = 1
+credential = 2
+webhook = 2

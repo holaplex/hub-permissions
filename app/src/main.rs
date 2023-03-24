@@ -16,7 +16,7 @@ pub fn main() {
         let Args { keto_write_url } = args;
 
         let keto = Configuration {
-            base_path: keto_write_url.to_string(),
+            base_path: keto_write_url,
             user_agent: None,
             client: reqwest::Client::new(),
             basic_auth: None,
