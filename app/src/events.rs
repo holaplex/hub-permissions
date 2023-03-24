@@ -115,6 +115,24 @@ async fn process_oauth2_client_created_event(
 
     info!("relation created {:?}", relation);
 
+    let relation = create_relationship(
+        &keto,
+        Some(&CreateRelationshipBody {
+            namespace: Some("Credential".to_string()),
+            object: Some(key.id.to_string()),
+            relation: Some("parents".to_string()),
+            subject_id: None,
+            subject_set: Some(Box::new(SubjectSet {
+                object: payload.organization.to_string(),
+                namespace: "Organization".to_string(),
+                relation: String::default(),
+            })),
+        }),
+    )
+    .await?;
+
+    info!("relation created {:?}", relation);
+
     Ok(())
 }
 
