@@ -5,15 +5,25 @@
       "namespace": "Organization",
       "inputs": [
         "organization",
+        "EditOrganizationInput",
         "CreateProjectInput",
         "CreateCredentialInput",
+        "EditCredentialInput",
+        "DeleteCredentialInput",
         "CreateWebhookInput",
+        "EditWebhookInput",
+        "DeleteWebhookInput",
         "InviteMemberInput"
       ]
     },
     {
       "namespace": "Project",
-      "inputs": ["project", "CreateCustomerInput", "CreateDropInput"]
+      "inputs": [
+        "project",
+        "EditProjectInput",
+        "CreateCustomerInput",
+        "CreateDropInput"
+      ]
     },
     {
       "namespace": "Drop",
