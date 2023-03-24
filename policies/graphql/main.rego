@@ -47,8 +47,13 @@ skip_authz {
 keto_allowed if check_relation(subject_id, action) == true
 keto_allowed if skip_authz
 
+valid_graphql {
+  valid_query
+  valid_schema
+}
 allow {
   keto_allowed
+  valid_graphql
 }
 
 reason := { 

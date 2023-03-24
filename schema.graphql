@@ -15,9 +15,13 @@ type AcceptInvitePayload {
   invite: Invite!
 }
 
+"""An access token used to authenticate and authorize access to the Hub API."""
 type AccessToken {
+  """A string representing the access token used to authenticate requests."""
   accessToken: String!
+  """A timestamp indicating when the access token will expire."""
   expiresAt: NaiveDateTime!
+  """A string indicating the type of access token, such as "Bearer"."""
   tokenType: String!
 }
 
@@ -112,13 +116,19 @@ type CollectionMint {
   collection: Collection
 }
 
+"""This struct represents the input for creating a new API credential, including the ID of the organization that the credential will be associated with and the friendly name assigned to the credential."""
 input CreateCredentialInput {
+  """The ID of the organization that the new API credential will be associated with."""
   organization: UUID!
+  """The friendly name assigned to the new API credential."""
   name: String!
 }
 
+"""The response payload returned after successfully creating an API credential. It includes the newly created Credential object, which represents the API credential, as well as an `AccessToken` object that can be used to authenticate requests to the Hub API."""
 type CreateCredentialPayload {
+  """A `Credential` object representing the newly created API credential."""
   credential: Credential!
+  """An `AccessToken` object that can be used to authenticate requests to the Hub API."""
   accessToken: AccessToken!
 }
 
@@ -206,11 +216,17 @@ enum CreationStatus {
   PENDING
 }
 
+"""An `OAuth2` client application used for authentication with the Hub API."""
 type Credential {
+  """A user-friendly name assigned to the credential."""
   name: String!
+  """A unique identifier for the credential."""
   clientId: String!
+  """The ID of the user who created the credential."""
   createdById: UUID!
+  """The ID of the organization the credential belongs to."""
   organizationId: UUID!
+  """The datetime in UTC when the credential was created."""
   createdAt: NaiveDateTime!
   """This field represents the user who created the credential."""
   createdBy: User
@@ -237,11 +253,15 @@ The input/output is a string in RFC3339 format.
 """
 scalar DateTime
 
+"""The input for deleting a credential."""
 input DeleteCredentialInput {
+  """The unique identifier assigned to the credential to be deleted."""
   credential: String!
 }
 
+"""The response for deleting a credential."""
 type DeleteCredentialPayload {
+  """The unique identifier assigned to the deleted credential."""
   credential: String!
 }
 
@@ -290,12 +310,17 @@ enum DropStatus {
   CREATING
 }
 
+"""The input for editing the name of an existing credential by providing the `client_id` of the credential and the new `name` to be assigned."""
 input EditCredentialInput {
+  """A unique string identifier assigned to the credential during creation."""
   clientId: String!
+  """The new name to be assigned to the credential."""
   name: String!
 }
 
+"""The response for editing the name of a credential."""
 type EditCredentialPayload {
+  """The updated credential with the edited name."""
   credential: Credential!
 }
 
@@ -332,12 +357,19 @@ type EditWebhookPayload {
   webhook: Webhook!
 }
 
+"""An event to which an external service can subscribe."""
 type EventType {
+  """Whether the event is archived or not."""
   archived: Boolean
+  """The date and time when the event was created, in string format."""
   createdAt: String!
+  """A description of the event."""
   description: String!
+  """The name of the event."""
   name: String!
+  """The JSON schema for the event payload."""
   schemas: JSON!
+  """The date and time when the event was last updated, in string format."""
   updatedAt: String!
 }
 
@@ -505,26 +537,11 @@ type MintEditionPayload {
 }
 
 type Mutation {
-  """
-  Res
-  
-  # Errors
-  This function fails if ...
-  """
+  """Create an API credential to authenticate and authorize API requests to the Holaplex Hub."""
   createCredential(input: CreateCredentialInput!): CreateCredentialPayload!
-  """
-  Res
-  
-  # Errors
-  This function fails if ...
-  """
+  """Edit the name assigned to the API credential."""
   editCredential(input: EditCredentialInput!): EditCredentialPayload!
-  """
-  Res
-  
-  # Errors
-  This function fails if ...
-  """
+  """Delete the OAuth2 API credential."""
   deleteCredential(input: DeleteCredentialInput!): DeleteCredentialPayload!
   """This mutation creates a customer record and a corresponding treasury that holds custodial wallets on behalf of a user. The treasury serves as a way to group the customer's wallets together. This makes it easier to manage wallets and associated assets for the user within a specific project. The customer and treasury are associated with the specified project ID. The response includes the newly created customer record. If there is an error connecting to the database or unable to emit a customer created event, the mutation will fail and an error will be returned."""
   createCustomer(input: CreateCustomerInput!): CreateCustomerPayload!
@@ -612,7 +629,32 @@ scalar NaiveDateTime
 type Organization {
   """The unique identifier assigned to the Holaplex organization, which is used to distinguish it from other organizations within the Holaplex ecosystem."""
   id: UUID!
+  """
+  Get a single API credential by client ID.
+  
+  # Arguments
+  
+  * `ctx` - The GraphQL context object containing the database connection pool and other data.
+  * `client_id` - The client ID of the API credential to retrieve.
+  
+  # Returns
+  
+  The API credential with the specified client ID.
+  """
   credential(clientId: String!): Credential!
+  """
+  Get a list of API credentials associated with this organization.
+  
+  # Arguments
+  
+  * `ctx` - The GraphQL context object containing the database connection pool and other data.
+  * `limit` - Optional limit on the number of credentials to retrieve.
+  * `offset` - Optional offset for the credentials to retrieve.
+  
+  # Returns
+  
+  A list of API credentials associated with this organization.
+  """
   credentials(limit: Int, offset: Int): [Credential!]!
   """The name given to the Holaplex organization, which is used to identify it within the Holaplex ecosystem and to its members and users."""
   name: String!
@@ -630,7 +672,38 @@ type Organization {
   invites(status: InviteStatus): [Invite!]!
   """The projects that have been created and are currently associated with the Holaplex organization, which are used to organize NFT campaigns or initiatives within the organization."""
   projects: [Project!]!
+  """
+  Retrieves a list of all webhooks associated with the organization.
+  
+  # Arguments
+  
+  * `ctx` - The context object representing the current request.
+  
+  # Returns
+  
+  A vector of all Webhook objects associated with the Organization, or None if there are none.
+  
+  # Errors
+  
+  This function will return an error if the data context cannot be retrieved.
+  """
   webhooks: [Webhook!]
+  """
+  Retrieves a specific webhook associated with the organization, based on its ID.
+  
+  # Arguments
+  
+  * `ctx` - The context object representing the current request.
+  * `id` - The UUID of the Webhook to retrieve.
+  
+  # Returns
+  
+  The specified Webhook object, or None if it does not exist.
+  
+  # Errors
+  
+  This function will return an error if the data context cannot be retrieved.
+  """
   webhook(id: UUID!): Webhook
 }
 
@@ -689,10 +762,15 @@ type Query {
   """Retrieve a member invitation by its ID."""
   invite(id: UUID!): Invite
   """
-  Res
+  Returns a list of event types that an external service can subscribe to.
+  
+  # Returns
+  
+  A vector of EventType objects representing the different event types that can be subscribed to.
   
   # Errors
-  This function fails if ...
+  
+  This function returns an error if there was a problem with retrieving the event types.
   """
   eventTypes: [EventType!]!
 }
@@ -760,20 +838,31 @@ type Wallet {
   createdBy: UUID!
 }
 
+"""A webhook represents an endpoint registered to receive notifications for specific events within a project."""
 type Webhook {
+  """Retrieves the ID of the user who created the webhook."""
   createdById: UUID!
   """The user who created the webhook."""
   createdBy: User
+  """Retrieves the ID of the webhook."""
   id: UUID!
+  """Retrieves the channels the webhook is subscribed to."""
   channels: [String!]!
   """This field specifies the list of projects for which an associated object will trigger a webhook event."""
   projects: [Project!]!
+  """Retrieves the ID of the webhook's endpoint."""
   endpointId: String!
+  """Retrieves the URL of the webhook's endpoint."""
   url: String!
+  """Retrieves the events the webhook is subscribed to."""
   events: [FilterType!]!
+  """Retrieves the webhook's description."""
   description: String!
+  """Retrieves the creation datetime of the webhook."""
   createdAt: NaiveDateTime!
+  """Retrieves the ID of the organization the webhook belongs to."""
   organizationId: UUID!
+  """Retrieves the last update datetime of the webhook."""
   updatedAt: NaiveDateTime
 }
 
