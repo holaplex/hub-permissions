@@ -1,8 +1,7 @@
 import { Namespace, Context } from "@ory/keto-namespace-types"
-
 class User implements Namespace {}
 
-class Webhook implements Namespace {
+class Credential implements Namespace {
   related: {
     owners: User[]
     editors: User[]
@@ -21,7 +20,7 @@ class Webhook implements Namespace {
       this.permits.delete(ctx),
     delete: (ctx: Context): boolean =>
       this.related.owners.includes(ctx.subject) ||
-      this.related.parents.traverse((parent) => parent.permits.delete(ctx)),
+      this.related.parents.traverse((parent) => parent.permits.edit(ctx)),
   }
 }
 
