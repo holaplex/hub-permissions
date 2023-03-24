@@ -133,7 +133,6 @@ async fn process_oauth2_client_created_event(
 
     info!("relation created {:?}", relation);
 
-
     Ok(())
 }
 
