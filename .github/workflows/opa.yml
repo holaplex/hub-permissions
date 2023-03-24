@@ -1,0 +1,44 @@
+name: Test policies, build bundle and upload
+on: 
+  push:
+    branches: [ dev ]
+jobs:
+  build:
+    name: Test build and upload
+    runs-on: ubuntu-latest
+    steps:
+    - name: Check out repository code
+      uses: actions/checkout@v3
+
+    - name: Setup OPA
+      uses: open-policy-agent/setup-opa@v2
+      with:
+        version: latest
+
+    - name: Run OPA Tests
+      run: opa test policies -v
+
+    - name: Build bundle
+      if: success()
+      run: |
+        schema_raw=$(sed -e ':a' -e 'N' -e '$!ba' -e 's/"[^"]*"//g' schema.graphql) && \
+        jq --arg data "$schema_raw" '.schema |= $data' policies/data.json > out.json && \
+        cp out.json policies/data.json && rm out.json
+        opa build -b policies 
+
+    - name: Upload bundle
+      if: success()
+      uses: keithweaver/aws-s3-github-action@v1.0.0
+      with:
+        command: cp
+        source: ./bundle.tar.gz
+        destination: s3://${{ secrets.AWS_BUCKET }}/bundle.tar.gz
+        aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws_region: ${{ secrets.AWS_REGION }}
+
+    - name: Commit and push changes
+      uses: devops-infra/action-commit-push@master
+      with:
+        github_token: ${{ secrets.ACTIONS_TOKEN}}
+        commit_message: "Updated data.json and uploaded policy bundle"
