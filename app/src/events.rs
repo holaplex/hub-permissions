@@ -81,7 +81,7 @@ async fn process_org_created_event(keto: Configuration, key: OrganizationEventKe
             subject_set: Some(Box::new(SubjectSet {
                 object: key.user_id.to_string(),
                 namespace: "User".to_string(),
-                relation: "session".to_string(),
+                relation: String::new(),
             })),
         }),
     )
