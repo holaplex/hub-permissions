@@ -1,3 +1,4 @@
 target
 /.vscode/
 .env.local
+bundle.tar.gz

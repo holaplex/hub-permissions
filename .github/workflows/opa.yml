@@ -35,10 +35,4 @@ jobs:
         destination: s3://${{ secrets.AWS_BUCKET }}/bundle.tar.gz
         aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
         aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws_region: ${{ secrets.AWS_REGION }}
-
-    - name: Commit and push changes
-      uses: devops-infra/action-commit-push@master
-      with:
-        github_token: ${{ secrets.ACTIONS_TOKEN}}
-        commit_message: "Updated data.json and uploaded policy bundle"
+        aws_region: ${{ secrets.AWS_REGION }} 
