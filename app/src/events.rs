@@ -152,8 +152,8 @@ async fn process_oauth2_client_deleted_event(
         Some(""),
     )
     .await?;
- 
-   delete_relationships(
+
+    delete_relationships(
         &keto,
         Some("Credential"),
         Some(&key.id),
@@ -165,7 +165,7 @@ async fn process_oauth2_client_deleted_event(
     )
     .await?;
 
-   Ok(())
+    Ok(())
 }
 
 async fn process_project_created_event(keto: Configuration, payload: Project) -> Result<()> {
