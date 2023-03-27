@@ -1,18 +1,12 @@
 {
-  "no_authz_selections": [
-    "createOrganization",
-    "invite",
-    "acceptInvite"
-  ],
+  "no_authz_selections": ["createOrganization", "invite", "acceptInvite"],
   "mappings": [
     {
       "namespace": "Organization",
       "actions": [
         {
           "action": "view",
-          "selections": [
-            "organization"
-          ]
+          "selections": ["organization"]
         },
         {
           "action": "edit",
@@ -30,16 +24,16 @@
       "namespace": "Credential",
       "actions": [
         {
+          "action": "view",
+          "selections": ["credential"]
+        },
+        {
           "action": "edit",
-          "selections": [
-            "editCredential"
-          ]
+          "selections": ["editCredential"]
         },
         {
           "action": "delete",
-          "selections": [
-            "deleteCredential"
-          ]
+          "selections": ["deleteCredential"]
         }
       ]
     },
@@ -48,21 +42,15 @@
       "actions": [
         {
           "action": "view",
-          "selections": [
-            "user"
-          ]
+          "selections": ["user"]
         },
         {
           "action": "edit",
-          "selections": [
-            "editUser"
-          ]
+          "selections": ["editUser"]
         },
         {
           "action": "delete",
-          "selections": [
-            "deleteUser"
-          ]
+          "selections": ["deleteUser"]
         }
       ]
     },
@@ -71,21 +59,15 @@
       "actions": [
         {
           "action": "view",
-          "selections": [
-            "webhook"
-          ]
+          "selections": ["webhook"]
         },
         {
           "action": "edit",
-          "selections": [
-            "editWebhook"
-          ]
+          "selections": ["editWebhook"]
         },
         {
           "action": "delete",
-          "selections": [
-            "deleteWebhook"
-          ]
+          "selections": ["deleteWebhook"]
         }
       ]
     },
@@ -94,23 +76,15 @@
       "actions": [
         {
           "action": "view",
-          "selections": [
-            "project"
-          ]
+          "selections": ["project"]
         },
         {
           "action": "edit",
-          "selections": [
-            "editProject",
-            "createCustomer",
-            "createDrop"
-          ]
+          "selections": ["editProject", "createCustomer", "createDrop"]
         },
         {
           "action": "delete",
-          "selections": [
-            "deleteProject"
-          ]
+          "selections": ["deleteProject"]
         }
       ]
     },
@@ -119,9 +93,7 @@
       "actions": [
         {
           "action": "view",
-          "selections": [
-            "drop"
-          ]
+          "selections": ["drop"]
         },
         {
           "action": "edit",
@@ -139,21 +111,15 @@
       "actions": [
         {
           "action": "view",
-          "selections": [
-            "customer"
-          ]
+          "selections": ["customer"]
         },
         {
           "action": "edit",
-          "selections": [
-            "editCustomer, createCustomerWallet"
-          ]
+          "selections": ["editCustomer, createCustomerWallet"]
         },
         {
           "action": "delete",
-          "selections": [
-            "deleteCustomer"
-          ]
+          "selections": ["deleteCustomer"]
         }
       ]
     }

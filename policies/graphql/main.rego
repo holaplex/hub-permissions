@@ -8,8 +8,6 @@ import data.hub.graphql.lib.query_arguments
 import data.hub.graphql.lib.mutation_definitions
 import data.hub.graphql.lib.mutation_fields
 import data.hub.graphql.lib.mutation_arguments
-import data.hub.graphql.lib.valid_schema
-import data.hub.graphql.lib.valid_query
 import data.hub.utils.keto.check_relation
 import data.hub.utils.keto.build_object as keto
 
@@ -30,18 +28,8 @@ skip_authz {
   keto.subject_id == input.graphql.variables[query_arguments.user.id]
 }
 
-keto_allowed if check_relation(keto) == true
-keto_allowed if skip_authz
-
-valid_graphql {
-  valid_query
-  valid_schema
-}
-
-allow {
-  keto_allowed
-  valid_graphql
-}
+allow if check_relation(keto) == true
+allow if skip_authz
 
 reason := { 
   "keto": keto, 
