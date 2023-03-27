@@ -1,55 +1,35 @@
 package hub.utils.keto
-import future.keywords.if
-import data.hub.graphql.lib.mutation_definitions
-import data.hub.graphql.lib.mutation_arguments
-import data.hub.graphql.lib.query_definitions
-import data.hub.graphql.lib.query_arguments
+import data.hub.utils.helpers.get_subject_id
+import data.hub.utils.helpers.get_selection
+import data.hub.utils.helpers.get_action
+import data.hub.utils.helpers.get_namespace
+import data.hub.utils.helpers.get_object_id
 
-get_input_name(action) := t {
-  t := [t |
-   action == "view" 
-   t := query_definitions[0].SelectionSet[0].Name
-  ][0]
-} 
+# Collect data from graphql query and request headers
+build_object() := d {
+  subject_id :=  get_subject_id()
+  selection := get_selection()
+  action := get_action(selection)
+  namespace := get_namespace(selection)
+  object := get_object_id(selection, lower(namespace))
 
-get_input_name(action) := t {
-  t := [t |
-    action == "edit"
-    t := mutation_definitions[0].VariableDefinitions[0].Type.NamedType
-    ][0]
+  d := {
+  "namespace": namespace,
+  "object": object,
+  "selection": selection,
+  "action": action,
+  "subject_id":  subject_id,
+  "subject_ns": "User",
+  }
 }
 
-get_input_name(x) = d {
-  d := [d | 
-    mutation_definitions[a].VariableDefinitions[i].Type.NamedType == x
-    d := mutation_definitions[a].VariableDefinitions[i].Variable
-    ][0]
-}
-
-get_namespace(x) = d {
-  d := [d | 
-    data.mappings[a].inputs[i] == x
-    d := data.mappings[a].namespace
-    ][0]
-}
-
-get_object_id(n) := id {
-  id := input.graphql.variables[n]
-} else := id {
-  id := input.graphql.variables.input[n]
-}
-
-check_relation(x, action) := d { 
-  input_name := get_input_name(action)
-  namespace := get_namespace(input_name)
-  object := get_object_id(lower(namespace))
-  
+check_relation(x) := d {   
   url_query := urlquery.encode_object({
-      "namespace": namespace,
-      "object": object,
-      "relation": action,
-      "subject_set.namespace": "User",
-      "subject_set.object": x,
+      "namespace": x.namespace,
+      "object": x.object,
+      "relation": x.action,
+      "subject_set.namespace": x.subject_ns,
+      "subject_set.object": x.subject_id,
       "subject_set.relation": "",
   })
   endpoint := concat("", [input.keto_endpoint, "/relation-tuples/check?", url_query])

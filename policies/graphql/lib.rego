@@ -62,13 +62,13 @@ query_arguments := a {
     count(query_definitions[i].SelectionSet[j].Arguments) > 0
     name := query_definitions[i].SelectionSet[j].Name
 
-    args := {field:value | 
+    args := {field: value |
       field := query_definitions[i].SelectionSet[j].Arguments[k].Name
-      value := query_definitions[i].SelectionSet[j].Arguments[k].Value.Raw
-      }
-    v := {name: args} 
+      value := get_value(query_definitions[i].SelectionSet[j].Arguments[k].Value)
+    }
+    v := {name: args}
   ]
-  a := {f:a | args[i][f]; a := {k:v| v := args[i][_][k]} }
+  a := {f: a | args[i][f]; a := {k: v | v := args[i][_][k]}}
 }
 
 mutation_arguments := a {
@@ -77,13 +77,23 @@ mutation_arguments := a {
     count(mutation_definitions[i].SelectionSet[j].Arguments) > 0
     name := mutation_definitions[i].SelectionSet[j].Name
 
-    args := {field:value | 
+    args := {field: value |
       field := mutation_definitions[i].SelectionSet[j].Arguments[k].Name
-      value := mutation_definitions[i].SelectionSet[j].Arguments[k].Value.Raw
-      }
+      value := get_value(mutation_definitions[i].SelectionSet[j].Arguments[k].Value)
+    }
     v := {name: args}
-  ] 
-  a := {f:a | args[i][f]; a := {k:v| v := args[i][_][k]} }
+  ]
+  a := {f: a | args[i][f]; a := {k: v | v := args[i][_][k]}}
+}
+
+get_value(value) = value.Raw {
+  value.Kind != 9
+}
+
+get_value(value) = children {
+  value.Kind == 9
+  children := {c.Name: c.Value.Raw | c := value.Children[_]}
+  children != {}
 }
 
 query_definitions = d {

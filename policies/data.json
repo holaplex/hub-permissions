@@ -1,54 +1,160 @@
 {
-  "no_authz_inputs": [
-    "CreateOrganizationInput",
+  "no_authz_selections": [
+    "createOrganization",
     "invite",
-    "AcceptInviteInput"
+    "acceptInvite"
   ],
   "mappings": [
     {
       "namespace": "Organization",
-      "inputs": [
-        "organization",
-        "EditOrganizationInput",
-        "CreateProjectInput",
-        "CreateCredentialInput",
-        "CreateWebhookInput",
-        "InviteMemberInput"
+      "actions": [
+        {
+          "action": "view",
+          "selections": [
+            "organization"
+          ]
+        },
+        {
+          "action": "edit",
+          "selections": [
+            "editOrganization",
+            "createCredential",
+            "createProject",
+            "createWebhook",
+            "inviteMember"
+          ]
+        }
       ]
     },
     {
       "namespace": "Credential",
-      "inputs": [
-        "EditCredentialInput",
-        "DeleteCredentialInput"
+      "actions": [
+        {
+          "action": "edit",
+          "selections": [
+            "editCredential"
+          ]
+        },
+        {
+          "action": "delete",
+          "selections": [
+            "deleteCredential"
+          ]
+        }
+      ]
+    },
+    {
+      "namespace": "User",
+      "actions": [
+        {
+          "action": "view",
+          "selections": [
+            "user"
+          ]
+        },
+        {
+          "action": "edit",
+          "selections": [
+            "editUser"
+          ]
+        },
+        {
+          "action": "delete",
+          "selections": [
+            "deleteUser"
+          ]
+        }
       ]
     },
     {
       "namespace": "Webhook",
-      "inputs": [
-        "EditWebhookInput",
-        "DeleteWebhookInput"
+      "actions": [
+        {
+          "action": "view",
+          "selections": [
+            "webhook"
+          ]
+        },
+        {
+          "action": "edit",
+          "selections": [
+            "editWebhook"
+          ]
+        },
+        {
+          "action": "delete",
+          "selections": [
+            "deleteWebhook"
+          ]
+        }
       ]
     },
     {
       "namespace": "Project",
-      "inputs": [
-        "project",
-        "EditProjectInput",
-        "CreateCustomerInput",
-        "CreateDropInput"
+      "actions": [
+        {
+          "action": "view",
+          "selections": [
+            "project"
+          ]
+        },
+        {
+          "action": "edit",
+          "selections": [
+            "editProject",
+            "createCustomer",
+            "createDrop"
+          ]
+        },
+        {
+          "action": "delete",
+          "selections": [
+            "deleteProject"
+          ]
+        }
       ]
     },
     {
       "namespace": "Drop",
-      "inputs": [
-        "MintDropInput"
+      "actions": [
+        {
+          "action": "view",
+          "selections": [
+            "drop"
+          ]
+        },
+        {
+          "action": "edit",
+          "selections": [
+            "mintEdition",
+            "pauseDrop",
+            "resumeDrop",
+            "shutdownDrop"
+          ]
+        }
       ]
     },
     {
       "namespace": "Customer",
-      "inputs": [
-        "CreateCustomerWalletInput"
+      "actions": [
+        {
+          "action": "view",
+          "selections": [
+            "customer"
+          ]
+        },
+        {
+          "action": "edit",
+          "selections": [
+            "editCustomer, createCustomerWallet"
+          ]
+        },
+        {
+          "action": "delete",
+          "selections": [
+            "deleteCustomer"
+          ]
+        }
       ]
     }
   ],
