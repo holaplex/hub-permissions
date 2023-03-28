@@ -2,6 +2,8 @@ package hub.graphql.main
 
 import future.keywords.if
 import future.keywords.in
+
+import data.hub.utils.helpers.get_object_id
 import data.hub.graphql.lib.query_definitions
 import data.hub.graphql.lib.query_fields
 import data.hub.graphql.lib.query_arguments
@@ -9,26 +11,42 @@ import data.hub.graphql.lib.mutation_definitions
 import data.hub.graphql.lib.mutation_fields
 import data.hub.graphql.lib.mutation_arguments
 import data.hub.utils.keto.check_relation
-import data.hub.utils.keto.build_object as keto
+import data.hub.utils.keto.build_objects as keto
+import data.hub.graphql.lib.selections
 
 default allow := false
 
-skip_authz {
-  ## Skip if mutation found in data.no_authz_inputs
-  data.no_authz_selections[_] == query_definitions[0].SelectionSet[0].Alias
+
+self_query {
+  # Check there's only one value in query_definitions
+  count(query_definitions) == 1
+  # Check the value in query is exactly is 'user'
+  query_definitions[_].SelectionSet[_].Alias == "user"
+  # Check there's only one value in query_definitions[_].SelectionSet
+  count(query_definitions[_].SelectionSet) == 1
+  # Subject is querying itself
+  user_id := get_object_id("user", data.user.object)
+  keto[_].subject_id == user_id
 }
 
 skip_authz {
-  ## Skip if query found in data.no_authz_inputs
-  data.no_authz_selections[_] == mutation_definitions[0].SelectionSet[0].Alias
+  # Skip Authz only if All queries/mutations in the operation have skip: true mapped
+  all_skips := [v | s := selections[_]
+                   v := data[s].skip
+                   v == true
+              ]
+  count(selections) == count(all_skips)
 }
 
-skip_authz {
-  ## subject is querying itself
-  keto.subject_id == input.graphql.variables[query_arguments.user.id]
+
+allow {
+  # Check that all objects in the keto array pass the check_relation function
+  keto_all_true := [check_relation(obj) | obj := keto[_]]
+  count(keto_all_true) == count([x | x := keto_all_true[_]; x == true])
 }
 
-allow if check_relation(keto) == true
+
+allow if self_query
 allow if skip_authz
 
 reason := { 

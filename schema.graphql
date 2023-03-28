@@ -56,31 +56,16 @@ enum Blockchain {
   SOLANA
 }
 
-"""An NFT collection that has either a fixed supply or unlimited mints. NFT collections are deployed to a desired blockchain."""
 type Collection {
-  """The unique identifier for the collection."""
   id: UUID!
-  """The blockchain of the collection."""
   blockchain: Blockchain!
-  """The total supply of the collection. Setting to `null` implies unlimited minting."""
   supply: Int
-  """The creation status of the collection. When the collection is in a `CREATED` status you can mint NFTs from the collection."""
   creationStatus: CreationStatus!
-  """The blockchain address of the collection used to view it in blockchain explorers."""
   address: String
-  """The current number of NFTs minted from the collection."""
   totalMints: Int!
-  """
-  The metadata json associated to the collection.
-  ## References
-  [Metaplex v1.1.0 Standard](https://docs.metaplex.com/programs/token-metadata/token-standard)
-  """
   metadataJson: MetadataJson
-  """The list of minted NFTs from the collection including the NFTs address and current owner's wallet address."""
   mints: [CollectionMint!]
-  """The list of attributed creators for the collection."""
   creators: [CollectionCreator!]
-  """The list of current holders of NFTs from the collection."""
   holders: [Holder!]
 }
 
@@ -91,17 +76,9 @@ type CollectionCreator {
   share: Int!
 }
 
-"""An attributed creator for a colleciton."""
 input CollectionCreatorInput {
-  """The wallet address of the creator."""
   address: String!
-  """
-  This field indicates whether the collection's creator has been verified. This feature is only supported on the Solana blockchain.
-  ## References
-  [Metaplex Token Metadata - Verify creator instruction](https://docs.metaplex.com/programs/token-metadata/instructions#verify-a-creator)
-  """
   verified: Boolean
-  """The share of royalties payout the creator should receive."""
   share: Int!
 }
 
@@ -274,40 +251,32 @@ type DeleteWebhookPayload {
 }
 
 type Drop {
-  """The unique identifier for the drop."""
   id: UUID!
-  """The identifier of the project to which the drop is associated."""
   projectId: UUID!
-  """The creation status of the drop."""
   creationStatus: CreationStatus!
-  """The date and time in UTC when the drop is eligible for minting. A value of `null` means the drop can be minted immediately."""
   startTime: NaiveDateTime
-  """The end date and time in UTC for the drop. A value of `null` means the drop does not end until it is fully minted."""
   endTime: NaiveDateTime
-  """The cost to mint the drop in US dollars. When purchasing with crypto the user will be charged at the current conversion rate for the blockchain's native coin at the time of minting."""
   price: Int!
-  """The user id of the person who created the drop."""
   createdById: UUID!
-  """The date and time in UTC when the drop was created."""
   createdAt: NaiveDateTime!
-  """The collection for which the drop is managing mints."""
+  pausedAt: NaiveDateTime
+  """
+  The shutdown_at field represents the date and time in UTC when the drop was shutdown
+  If it is null, the drop is currently not shutdown
+  """
+  shutdownAt: NaiveDateTime
   collection: Collection!
-  """The current status of the drop."""
   status: DropStatus!
 }
 
-"""The different phases of a drop."""
 enum DropStatus {
-  """Actively minting."""
   MINTING
-  """The minting process for the collection is complete."""
   MINTED
-  """The drop is scheduled for minting."""
   SCHEDULED
-  """The drop has expired and its end time has passed."""
   EXPIRED
-  """The drop is still being created and is not ready to mint."""
   CREATING
+  PAUSED
+  SHUTDOWN
 }
 
 """The input for editing the name of an existing credential by providing the `client_id` of the credential and the new `name` to be assigned."""
@@ -373,25 +342,28 @@ type EventType {
   updatedAt: String!
 }
 
+"""An enumeration of event types that can be subscribed to by a webhook."""
 enum FilterType {
+  """Event triggered when a new project is created"""
   PROJECT_CREATED
+  """Event triggered when a new customer is created"""
   CUSTOMER_CREATED
+  """Event triggered when a new customer treasury is created"""
   CUSTOMER_TREASURY_CREATED
+  """Event triggered when a new wallet is created for a project"""
   PROJECT_WALLET_CREATED
+  """Event triggered when a new wallet is created for a customer"""
   CUSTOMER_WALLET_CREATED
+  """Event triggered when a new drop is created"""
   DROP_CREATED
+  """Event triggered when a new drop is minted"""
   DROP_MINTED
 }
 
-"""The holder of a collection."""
 type Holder {
-  """The collection ID that the holder owns."""
   collectionId: UUID!
-  """The wallet address of the holder."""
   address: String!
-  """The number of NFTs that the holder owns in the collection."""
   owns: Int!
-  """The specific mints from the collection that the holder owns."""
   mints: [String!]!
 }
 
@@ -460,38 +432,23 @@ type Member {
   invite: Invite
 }
 
-"""
-The collection's associated metadata JSON.
-## References
-[Metaplex v1.1.0 Standard](https://docs.metaplex.com/programs/token-metadata/token-standard)
-"""
 type MetadataJson {
   collectionId: UUID!
   identifier: String!
-  """The assigned name of the NFT."""
   name: String!
-  """The URI for the complete metadata JSON."""
   uri: String!
-  """The symbol of the NFT."""
   symbol: String!
-  """The description of the NFT."""
   description: String!
-  """The image URI for the NFT."""
   image: String!
-  """An optional animated version of the NFT art."""
   animationUrl: String
-  """An optional URL where viewers can find more information on the NFT, such as the collection's homepage or Twitter page."""
   externalUrl: String
   attributes: [MetadataJsonAttribute!]
 }
 
-"""An attribute of the NFT."""
 type MetadataJsonAttribute {
   id: UUID!
   collectionId: UUID!
-  """The name of the attribute."""
   traitType: String!
-  """The value of the attribute."""
   value: String!
 }
 
@@ -546,15 +503,29 @@ type Mutation {
   """This mutation creates a customer record and a corresponding treasury that holds custodial wallets on behalf of a user. The treasury serves as a way to group the customer's wallets together. This makes it easier to manage wallets and associated assets for the user within a specific project. The customer and treasury are associated with the specified project ID. The response includes the newly created customer record. If there is an error connecting to the database or unable to emit a customer created event, the mutation will fail and an error will be returned."""
   createCustomer(input: CreateCustomerInput!): CreateCustomerPayload!
   """
-  This mutation creates a new NFT drop and its associated collection. The drop returns immediately with a creation status of CREATING. You can [set up a webhook](https://docs.holaplex.dev/hub/For%20Developers/webhooks-overview) to receive a notification when the drop is ready to be minted.
-  Error
-  If the drop cannot be saved to the database or fails to be emitted for submission to the desired blockchain, the mutation will result in an error.
+  Res
+  
+  # Errors
+  This function fails if ...
   """
   createDrop(input: CreateDropInput!): CreateDropPayload!
+  """This mutation allows for the temporary blocking of the minting of editions and can be resumed by calling the resumeDrop mutation."""
+  pauseDrop(input: PauseDropInput!): PauseDropPayload!
+  """This mutation resumes a paused drop, allowing minting of editions to be restored"""
+  resumeDrop(input: ResumeDropInput!): ResumeDropPayload!
   """
-  This mutation mints an NFT edition for a specific drop ID. The mint returns immediately with a creation status of CREATING. You can [set up a webhook](https://docs.holaplex.dev/hub/For%20Developers/webhooks-overview) to receive a notification when the mint is accepted by the blockchain.
+  Shuts down a drop by writing the current UTC timestamp to the shutdown_at field of drop record.
+  Returns the `Drop` object on success.
+  
   # Errors
-  If the mint cannot be saved to the database or fails to be emitted for submission to the desired blockchain, the mutation will result in an error.
+  Fails if the drop or collection is not found, or if updating the drop record fails.
+  """
+  shutdownDrop(input: ShutdownDropInput!): ShutdownDropPayload!
+  """
+  Res
+  
+  # Errors
+  This function fails if ...
   """
   mintEdition(input: MintDropInput!): MintEditionPayload!
   """
@@ -725,6 +696,17 @@ type Owner {
   organization: Organization
 }
 
+"""Represents input fields for pausing a drop."""
+input PauseDropInput {
+  drop: UUID!
+}
+
+"""Represents the result of a successful pause drop mutation."""
+type PauseDropPayload {
+  """The drop that has been paused."""
+  drop: Drop!
+}
+
 """A Holaplex project that belongs to an organization. Projects are used to group unique NFT campaigns or initiatives, and are used to assign objects that end customers will interact with, such as drops and wallets."""
 type Project {
   """The unique identifier assigned to the Holaplex project."""
@@ -733,9 +715,7 @@ type Project {
   customer(id: UUID!): Customer
   """Retrieve all customer records associated with a given project."""
   customers: [Customer!]
-  """The drops associated with the project."""
   drops: [Drop!]
-  """Look up a drop associated with the project by its ID."""
   drop(id: UUID!): Drop
   """The friendly name assigned to the Holaplex project to differentiate it from other projects belonging to the organization."""
   name: String!
@@ -773,6 +753,28 @@ type Query {
   This function returns an error if there was a problem with retrieving the event types.
   """
   eventTypes: [EventType!]!
+}
+
+"""Represents input fields for resuming a paused drop."""
+input ResumeDropInput {
+  drop: UUID!
+}
+
+"""Represents the result of a successful resume drop mutation."""
+type ResumeDropPayload {
+  """The drop that has been resumed."""
+  drop: Drop!
+}
+
+"""Represents the input fields for shutting down a drop"""
+input ShutdownDropInput {
+  drop: UUID!
+}
+
+"""Represents the result of a successful shutdown drop mutation"""
+type ShutdownDropPayload {
+  """Drop that has been shutdown"""
+  drop: Drop!
 }
 
 """A collection of wallets assigned to different entities in the Holaplex ecosystem."""
@@ -822,11 +824,14 @@ entities without requiring a central allocating authority.
 """
 scalar UUID
 
-"""A blockchain wallet is a digital wallet that allows users to securely store, manage, and transfer their cryptocurrencies or other digital assets on a blockchain network."""
+"""
+A blockchain wallet.
+# Description
+A blockchain wallet is a digital wallet that allows users to securely store, manage, and transfer their cryptocurrencies or other digital assets on a blockchain network.
+"""
 type Wallet {
   """The wallet address."""
   address: String!
-  """The NFTs that were minted from Holaplex and are owned by the wallet's address."""
   mints: [CollectionMint!]
   treasuryId: UUID!
   """The wallet's associated blockchain."""
