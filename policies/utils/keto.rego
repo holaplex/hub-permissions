@@ -1,8 +1,6 @@
 package hub.utils.keto
 import data.hub.graphql.lib.selections
 import data.hub.utils.helpers.get_subject_id
-import data.hub.utils.helpers.get_namespace
-import data.hub.utils.helpers.get_object_id
 import data.hub.utils.helpers.get_object_id
 
 # Collect data from graphql query and request headers
