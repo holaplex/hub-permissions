@@ -5,14 +5,10 @@ import future.keywords.in
 
 import data.hub.utils.helpers.get_object_id
 import data.hub.graphql.lib.query_definitions
-import data.hub.graphql.lib.query_fields
-import data.hub.graphql.lib.query_arguments
 import data.hub.graphql.lib.mutation_definitions
-import data.hub.graphql.lib.mutation_fields
-import data.hub.graphql.lib.mutation_arguments
-import data.hub.utils.keto.check_relation
-import data.hub.utils.keto.build_objects as keto
 import data.hub.graphql.lib.selections
+import data.hub.utils.keto.build_objects as keto
+import data.hub.utils.keto.check_relation
 
 default allow := false
 
@@ -50,16 +46,6 @@ allow if self_query
 allow if skip_authz
 
 reason := { 
-  "keto": keto, 
+  "object": keto, 
   "graphql": input.graphql,
-  "mutation": { 
-    "definitions": mutation_definitions,
-    "fields": mutation_fields,
-    "arguments": mutation_arguments,
-    },
-  "query": { 
-    "definitions": query_definitions, 
-    "fields": query_fields,
-    "arguments": query_arguments,
-    }
-  }
+ } 
