@@ -1,7 +1,7 @@
 package hub.graphql.lib
 
 import future.keywords.in
-import data.schema as graphql_schema
+import data.graphql.schema as graphql_schema
 default graphql_document = {}
 
 selections := s {

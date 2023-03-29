@@ -1,0 +1,185 @@
+createOrganization:
+  skip: true
+invite:
+  skip: true
+acceptInvite:
+  skip: true
+organization:
+  object:
+    - id
+  action: view
+  namespace: Organization
+editOrganization:
+  object:
+    - input
+    - id
+  action: edit
+  namespace: Organization
+deleteOrganization:
+  object:
+    - input
+    - id
+  action: delete
+  namespace: Organization
+createCredential:
+  object:
+    - input
+    - organization
+  action: edit
+  namespace: Organization
+createProject:
+  object:
+    - input
+    - organization
+  action: edit
+  namespace: Organization
+createWebhook:
+  object:
+    - input
+    - organization
+  action: edit
+  namespace: Organization
+inviteMember:
+  object:
+    - input
+    - organization
+  action: edit
+  namespace: Organization
+credential:
+  object:
+    - clientId
+  action: view
+  namespace: Credential
+editCredential:
+  object:
+    - input
+    - clientId
+  action: edit
+  namespace: Credential
+deleteCredential:
+  object:
+    - input
+    - credential
+  action: delete
+  namespace: Credential
+user:
+  object:
+    - id
+  action: view
+  namespace: User
+editUser:
+  object:
+    - input
+    - id
+  action: edit
+  namespace: User
+deleteUser:
+  object:
+    - input
+    - id
+  action: delete
+  namespace: User
+webhook:
+  object:
+    - id
+  action: view
+  namespace: Webhook
+editWebhook:
+  object:
+    - input
+    - webhook
+  action: edit
+  namespace: Webhook
+deleteWebhook:
+  object:
+    - input
+    - webhook
+  action: delete
+  namespace: Webhook
+project:
+  object:
+    - id
+  action: view
+  namespace: Project
+editProject:
+  object:
+    - input
+    - id
+  action: edit
+  namespace: Project
+deleteProject:
+  object:
+    - input
+    - id
+  action: delete
+  namespace: Project
+createCustomer:
+  object:
+    - input
+    - project
+  action: edit
+  namespace: Project
+createDrop:
+  object:
+    - input
+    - project
+  action: edit
+  namespace: Project
+customer:
+  object:
+    - id
+  action: view
+  namespace: Customer
+editCustomer:
+  object:
+    - input
+    - id
+  action: edit
+  namespace: Customer
+deleteCustomer:
+  object:
+    - input
+    - id
+  action: delete
+  namespace: Customer
+createCustomerWallet:
+  object:
+    - input
+    - customer
+  action: edit
+  namespace: Customer
+drop:
+  object:
+    - id
+  action: view
+  namespace: Drop
+mintEdition:
+  object:
+    - input
+    - drop
+  action: edit
+  namespace: Drop
+editDrop:
+  object:
+    - input
+    - drop
+  action: edit
+  namespace: Drop
+pauseDrop:
+  object:
+    - input
+    - drop
+  action: edit
+  namespace: Drop
+resumeDrop:
+  object:
+    - input
+    - drop
+  action: edit
+  namespace: Drop
+shutdownDrop:
+  object:
+    - input
+    - drop
+  action: edit
+  namespace: Drop
