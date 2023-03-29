@@ -3,7 +3,6 @@ import data.hub.graphql.lib.selections
 import data.hub.utils.helpers.get_subject_id
 import data.hub.utils.helpers.get_object_id
 
-# Collect data from graphql query and request headers
 build_objects() := objs {
   subject_id := get_subject_id()
 

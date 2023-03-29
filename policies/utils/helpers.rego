@@ -1,10 +1,9 @@
 package hub.utils.helpers
-import input.request.headers as http_headers
-import data.hub.graphql.lib.query_definitions
-import data.hub.graphql.lib.query_arguments
-import data.hub.graphql.lib.mutation_definitions
-import data.hub.graphql.lib.mutation_arguments
+
 import future.keywords.if
+import data.hub.graphql.lib.query_arguments
+import data.hub.graphql.lib.mutation_arguments
+import input.request.headers as http_headers
 
 headers = {lower(k): v | v := http_headers[k]}
 
