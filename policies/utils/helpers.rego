@@ -1,10 +1,9 @@
 package hub.utils.helpers
-import input.request.headers as http_headers
-import data.hub.graphql.lib.query_definitions
-import data.hub.graphql.lib.query_arguments
-import data.hub.graphql.lib.mutation_definitions
-import data.hub.graphql.lib.mutation_arguments
+
 import future.keywords.if
+import input.request.headers as http_headers
+import data.hub.graphql.lib.query_arguments
+import data.hub.graphql.lib.mutation_arguments
 
 headers = {lower(k): v | v := http_headers[k]}
 
@@ -14,44 +13,20 @@ get_subject_id() := id {
   id := headers["x-user-id"]
 }
 
-get_selection() := n {
-  n := query_definitions[0].SelectionSet[0].Alias
-} else := n {
-  n := mutation_definitions[0].SelectionSet[0].Alias
-}
-
-get_action(x) = d {
-  d := [d | 
-    data.mappings[a].actions[b].selections[i] == x
-    d := data.mappings[a].actions[b].action
-    ][0]
-}
-
-get_namespace(x) = d {
-  d := [d | 
-    data.mappings[a].actions[b].selections[i] == x
-    d := data.mappings[a].namespace
-    ][0]
-}
-
-get_object_id(s, n) := id {
-  id := input.graphql.variables[n]
+get_object_id(s, p) := id {
+  input.graphql.operation == "query"
+  var_name = object.get(query_arguments[s], p, null)
+  id := input.graphql.variables[var_name]
 } else := id {
-  id := input.graphql.variables.input[n]
+  id := object.get(query_arguments[s], p, null)
 }
 
-get_object_id(s, n) := id {
-  not input.graphql.variables[n]
-  id := query_arguments[n].id
+get_object_id(s, p) := id {
+  input.graphql.operation == "mutation"
+  var_name := mutation_arguments[s][p[0]]
+  id := object.get(input.graphql.variables, [var_name, p[1] ], null)
 } else := id {
-  not input.graphql.variables.input[n]
-  id := query_arguments[s].input[n]
+  id := object.get(mutation_arguments[s], p, null)
 }
 
-get_object_id(s, n) := id {
-  not input.graphql.variables[n]
-  id := mutation_arguments[n].id
-} else := id {
-  not input.graphql.variables.input[n]
-  id := mutation_arguments[s].input[n]
-}
+

@@ -1,26 +1,39 @@
 package hub.graphql.lib
 
 import future.keywords.in
-
+import data.graphql.schema as graphql_schema
 default graphql_document = {}
 
+selections := s {
+  input.graphql.operation == "query"
+  s := [alias |
+    alias := query_definitions[_].SelectionSet[_].Alias
+  ]
+} else = s {
+  input.graphql.operation == "mutation"
+  s := [alias |
+    alias := mutation_definitions[_].SelectionSet[_].Alias
+  ]
+}
+
+
 schema := s {
-  s := graphql.parse_schema(data.schema)
+  s := graphql.parse_schema(graphql_schema)
 }
 query := q {
   q := graphql.parse_query(graphql_document)
 }
 
 ast := a {
-  a := graphql.parse(graphql_document, data.schema)
+  a := graphql.parse(graphql_document, graphql_schema)
 }
 
 valid_query := g {
-  g := graphql.is_valid(graphql_document, data.schema)
+  g := graphql.is_valid(graphql_document, graphql_schema)
 }
 
 valid_schema := g {
-  g := graphql.schema_is_valid(data.schema)
+  g := graphql.schema_is_valid(graphql_schema)
 }
 
 graphql_document := g {

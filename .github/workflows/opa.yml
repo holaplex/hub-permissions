@@ -21,9 +21,9 @@ jobs:
     - name: Build bundle
       if: success()
       run: |
+        json_schema_path=policies/graphql/data.json
         schema_raw=$(python3 clean-schema.py schema.graphql) && \
-        jq --arg data "$schema_raw" '.schema |= $data' policies/data.json > out.json && \
-        cp out.json policies/data.json && rm out.json
+        jq --null-input --arg data "$schema_raw" '.schema |= $data' > "$json_schema_path" && \
         opa build -b policies 
 
     - name: Upload bundle
