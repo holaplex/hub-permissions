@@ -1,9 +1,9 @@
 package hub.utils.helpers
 
 import future.keywords.if
+import input.request.headers as http_headers
 import data.hub.graphql.lib.query_arguments
 import data.hub.graphql.lib.mutation_arguments
-import input.request.headers as http_headers
 
 headers = {lower(k): v | v := http_headers[k]}
 
@@ -15,14 +15,16 @@ get_subject_id() := id {
 
 get_object_id(s, p) := id {
   input.graphql.operation == "query"
-  id := input.graphql.variables[query_arguments[s][p[0]]]
+  var_name = object.get(query_arguments[s], p, null)
+  id := input.graphql.variables[var_name]
 } else := id {
   id := object.get(query_arguments[s], p, null)
 }
 
 get_object_id(s, p) := id {
   input.graphql.operation == "mutation"
-  id := input.graphql.variables[mutation_arguments[s][p[0]]][p[1]]
+  var_name := mutation_arguments[s][p[0]]
+  id := object.get(input.graphql.variables, [var_name, p[1] ], null)
 } else := id {
   id := object.get(mutation_arguments[s], p, null)
 }

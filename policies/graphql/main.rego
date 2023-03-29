@@ -3,12 +3,12 @@ package hub.graphql.main
 import future.keywords.if
 import future.keywords.in
 
-import data.hub.graphql.lib.selections
+import data.hub.utils.helpers.get_object_id
 import data.hub.graphql.lib.query_definitions
 import data.hub.graphql.lib.mutation_definitions
-import data.hub.utils.helpers.get_object_id
 import data.hub.utils.keto.check_relation
 import data.hub.utils.keto.build_objects as keto
+import data.hub.graphql.lib.selections
 
 default allow := false
 
@@ -36,16 +36,17 @@ skip_authz {
 
 
 allow {
-  # Check that all objects in the keto array pass the check_relation function
-  keto_all_true := [check_relation(obj) | obj := keto[_]]
-  count(keto_all_true) == count([x | x := keto_all_true[_]; x == true])
+  # Check that all queries/mutations in the operation passed the relation check
+  keto_all_true := [x | obj := keto[_]; x := check_relation(obj); not is_null(x)]
+  count(selections) == count([x | x := keto_all_true[_]; x == true])
 }
+
 
 
 allow if self_query
 allow if skip_authz
 
 reason := { 
-  "object": keto, 
+  "keto": keto, 
   "graphql": input.graphql,
- } 
+  }
