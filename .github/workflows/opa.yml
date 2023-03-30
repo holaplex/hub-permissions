@@ -2,6 +2,8 @@ name: Test policies, build bundle and upload
 on: 
   push:
     branches: [ main ]
+  workflow_dispatch:
+      
 jobs:
   build:
     name: Test build and upload
@@ -17,6 +19,15 @@ jobs:
 
     - name: Run OPA Tests
       run: opa test policies -v
+    - name: Retrieve latest GraphQL Schema
+      env:
+        APOLLO_KEY: ${{ secrets.APOLLO_KEY }}
+      run: |
+        # install rover CLI
+        curl -sSL https://rover.apollo.dev/nix/latest | sh
+        export PATH="/home/runner/.rover/bin:$PATH"
+        # Retrieve and save schema
+        rover graph fetch hub-dev@current --skip-update-check --output plain > schema.graphql
 
     - name: Build bundle
       if: success()
