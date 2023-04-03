@@ -124,6 +124,12 @@ permission:
       - project
     action: edit
     namespace: Project
+  patchDrop:
+    object:
+      - input
+      - id
+    action: edit
+    namespace: Drop
   createDrop:
     object:
       - input
