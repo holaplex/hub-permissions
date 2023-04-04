@@ -1,10 +1,10 @@
 [registry]
-endpoint = "https://schemas.holaplex.tools"
+endpoint = "https://schemas.holaplex.tools/"
 
 [schemas]
-organization = 2
-nfts = 1
+organization = 3
+nfts = 3
 customer = 1
-treasury = 4
+treasury = 5
 credential = 2
 webhook = 2
