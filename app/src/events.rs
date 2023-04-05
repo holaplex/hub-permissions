@@ -23,15 +23,21 @@ use crate::{
 pub async fn process(msg: Services, keto: Configuration) -> Result<()> {
     // match topics
     match msg {
-        Services::Organizations(k, e) => match e.event {
+        Services::Organizations(key, e) => match e.event {
             Some(organization_events::Event::OrganizationCreated(_)) => {
-                process_org_created_event(keto, k).await
+                process_org_created_event(keto, key).await
             },
             Some(organization_events::Event::ProjectCreated(payload)) => {
                 process_project_created_event(keto, payload).await
             },
             Some(organization_events::Event::MemberAdded(payload)) => {
-                process_member_added_event(keto, k, payload).await
+                process_member_added_event(keto, key, payload).await
+            },
+            Some(organization_events::Event::MemberDeactivated(payload)) => {
+                process_member_deactivated_event(keto, key, payload).await
+            },
+            Some(organization_events::Event::MemberReactivated(payload)) => {
+                process_member_added_event(keto, key, payload).await
             },
             Some(_) | None => Ok(()),
         },
@@ -311,4 +317,26 @@ async fn process_webhook_deleted_event(
     )
     .await
     .map_err(Into::into)
+}
+
+async fn process_member_deactivated_event(
+    keto: Configuration,
+    key: OrganizationEventKey,
+    payload: Member,
+) -> Result<()> {
+    delete_relationships(
+        &keto,
+        Some("Organization"),
+        Some(&payload.organization_id),
+        Some("editors"),
+        None,
+        Some("User"),
+        Some(&key.user_id),
+        None,
+    )
+    .await?;
+
+    info!("relation deleted for user {:?}", key.user_id);
+
+    Ok(())
 }
