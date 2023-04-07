@@ -188,3 +188,15 @@ permission:
       - drop
     action: edit
     namespace: Drop
+  reactivateMember:
+    object:
+      - input
+      - id
+    action: delete
+    namespace: Organization
+  deactivateMember:
+    object:
+      - input
+      - id
+    action: delete
+    namespace: Organization
