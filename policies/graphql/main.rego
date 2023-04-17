@@ -43,5 +43,3 @@ allow {
 
 allow if skip_authz
 allow if self_query
-
-status_code := 401
