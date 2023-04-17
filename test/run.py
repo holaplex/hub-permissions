@@ -136,6 +136,74 @@ create_relation_tuple('Project', 'JohnProject', 'parents', subject_set=SubjectSe
     object="JohnOrg",
 ))
 
+print('------------------------------')
+print("[.] Creating parent relations Org <- Project <- Drop")
+print('------------------------------')
+## Alice creates a drop in project 'Project1' under 'Org1'
+create_relation_tuple("Drop", "Drop1", "parents", subject_set=SubjectSet(
+    namespace="Project",
+    object="Project1",
+))
+
+print('------------------------------')
+print("[.] Creating parent relations  Drop <- Mint ")
+print('------------------------------')
+## Alice creates a drop in project 'Project1' under 'Org1'
+create_relation_tuple("Mint", "Mint1", "parents", subject_set=SubjectSet(
+    namespace="Drop",
+    object="Drop1",
+))
+
+## Testing permissions
+print('------------------------------')
+print("[.] Testing Permissions: User -> Action -> Mint")
+print('------------------------------')
+
+ss = SubjectSet(
+    namespace='User',
+    object='Bob',
+    relation='session',
+)
+namespace = "Mint"
+object = "Mint1"
+
+## Can User Bob transferAsset / retryMint from Org1/Project1/Drop1 ?
+action = 'edit' 
+x = check_relation_tuple(namespace, object, action, subject_set=ss)
+assert x[1] == False
+
+
+## Can User Alice transferAsset / retryMint from Org1/Project1/Drop1 ?
+ss = SubjectSet(
+    namespace='User',
+    object='Alice',
+    relation='session',
+)
+namespace = "Mint"
+object = "Mint1"
+
+action = 'edit' 
+x = check_relation_tuple(namespace, object, action, subject_set=ss)
+assert x[1] == True
+
+## Testing permissions
+print('------------------------------')
+print("[.] Testing Permissions: User -> Action -> Drop")
+print('------------------------------')
+
+ss = SubjectSet(
+    namespace='User',
+    object='Bob',
+    relation='session',
+)
+namespace = "Drop"
+object = "Drop1"
+
+## Can User Bob edit Project1/Drop1?
+action = 'edit'
+x = check_relation_tuple(namespace, object, action, subject_set=ss)
+assert x[1] == False
+
 ## Testing permissions
 print('------------------------------')
 print("[.] Testing Permissions: User -> Action -> Project")
