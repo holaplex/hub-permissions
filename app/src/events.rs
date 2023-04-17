@@ -9,9 +9,9 @@ use ory_keto_client::{
 
 use crate::{
     proto::{
-        credential_events, customer_events, organization_events, treasury_events, webhook_events,
+        credential_events, customer_events, organization_events, treasury_events, webhook_events, nft_events,
         CredentialEventKey, Customer, CustomerEventKey, Member, OAuth2Client, OrganizationEventKey,
-        Project, TreasuryEventKey, Webhook, WebhookEventKey,
+        Project, TreasuryEventKey, Webhook, WebhookEventKey, MintTransaction, NftEventKey
     },
     Services,
 };
@@ -73,6 +73,12 @@ pub async fn process(msg: Services, keto: Configuration) -> Result<()> {
             },
             None => Ok(()),
         },
+        Services::Nfts(key, payload) => match payload.event {
+            Some(nft_events::Event::MintDrop(payload)) => {
+                process_nfts_mint_drop_event(keto, key, payload).await
+            },
+            Some(_) | None => Ok(()),
+        }
     }
 }
 
@@ -337,6 +343,32 @@ async fn process_member_deactivated_event(
     .await?;
 
     info!("relation deleted for user {:?}", key.user_id);
+
+    Ok(())
+}
+
+async fn process_nfts_mint_drop_event(
+    keto: Configuration,
+    key: NftEventKey,
+    payload: MintTransaction,
+) -> Result<()> {
+    let relation = create_relationship(
+        &keto,
+        Some(&CreateRelationshipBody {
+            namespace: Some("Mint".to_string()),
+            object: Some(key.id.to_string()),
+            relation: Some("parents".to_string()),
+            subject_id: None,
+            subject_set: Some(Box::new(SubjectSet {
+                object: payload.drop_id.to_string(),
+                namespace: "Drop".to_string(),
+                relation: String::default(),
+            })),
+        }),
+    )
+    .await?;
+
+    info!("relation created {:?}", relation);
 
     Ok(())
 }
