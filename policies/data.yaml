@@ -200,3 +200,15 @@ permission:
       - id
     action: delete
     namespace: Organization
+  retryMint:
+    object:
+      - input
+      - mint_id
+    action: edit
+    namespace: Mint
+  transferAsset:
+    object:
+      - input
+      - id 
+    action: edit
+    namespace: Mint
