@@ -9,9 +9,10 @@ use ory_keto_client::{
 
 use crate::{
     proto::{
-        credential_events, customer_events, organization_events, treasury_events, webhook_events, nft_events,
-        CredentialEventKey, Customer, CustomerEventKey, Member, OAuth2Client, OrganizationEventKey,
-        Project, TreasuryEventKey, Webhook, WebhookEventKey, MintTransaction, NftEventKey
+        credential_events, customer_events, nft_events, organization_events, treasury_events,
+        webhook_events, CredentialEventKey, Customer, CustomerEventKey, Member, MintTransaction,
+        NftEventKey, OAuth2Client, OrganizationEventKey, Project, TreasuryEventKey, Webhook,
+        WebhookEventKey,
     },
     Services,
 };
@@ -78,7 +79,7 @@ pub async fn process(msg: Services, keto: Configuration) -> Result<()> {
                 process_nfts_mint_drop_event(keto, key, payload).await
             },
             Some(_) | None => Ok(()),
-        }
+        },
     }
 }
 
