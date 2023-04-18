@@ -339,7 +339,7 @@ async fn process_member_deactivated_event(
         None,
         Some("User"),
         Some(&key.user_id),
-        None,
+        Some(""),
     )
     .await?;
 
