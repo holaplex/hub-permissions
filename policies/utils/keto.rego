@@ -2,6 +2,7 @@ package hub.utils.keto
 import data.hub.graphql.lib.selections
 import data.hub.utils.helpers.get_subject_id
 import data.hub.utils.helpers.get_object_id
+import data.hub.utils.helpers.headers
 import data.permission as permission
 
 build_objects() := objs {
@@ -38,6 +39,7 @@ check_relation(x) := d {
     "headers": {
       "Content-Type": "application/x-www-form-urlencoded",
       "Accept": "application/json",
+      "X-Request-Id": headers["x-request-id"],
     },
     "force_json_decode": true,
     "force_cache": false,
