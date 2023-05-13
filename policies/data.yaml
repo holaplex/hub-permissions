@@ -9,6 +9,8 @@ permission:
     skip: true
   acceptInvite:
     skip: true
+  creditSheet:
+    skip: true
   organization:
     object:
       - id
