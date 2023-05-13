@@ -39,9 +39,9 @@ jobs:
 
       - uses: tespkg/actions-cache@v1
         with:
-          accessKey: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          secretKey: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          bucket: ${{ vars.AWS_BUCKET }}
+          accessKey: ${{ secrets.AWS_CACHE_ACCESS_KEY_ID }}
+          secretKey: ${{ secrets.AWS_CACHE_SECRET_ACCESS_KEY }}
+          bucket: ${{ vars.AWS_CACHE_BUCKET }}
           path: |
             ~/.cargo/bin/
             ~/.cargo/registry/index/
