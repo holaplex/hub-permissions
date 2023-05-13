@@ -3,3 +3,4 @@ target
 .env.local
 bundle.tar.gz
 policies/graphql/data.json
+.DS_Store
