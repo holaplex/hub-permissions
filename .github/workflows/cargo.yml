@@ -26,8 +26,11 @@ jobs:
             toolchain: nightly-2022-12-11
             override: true
             components: rustfmt, clippy
-      - uses: actions/cache@v3
+      - uses: tespkg/actions-cache@v1
         with:
+          accessKey: ${{ secrets.AWS_CACHE_ACCESS_KEY_ID }}
+          secretKey: ${{ secrets.AWS_CACHE_SECRET_ACCESS_KEY }}
+          bucket: ${{ vars.AWS_CACHE_BUCKET }}
           path: |
             ~/.cargo/bin/
             ~/.cargo/registry/index/
