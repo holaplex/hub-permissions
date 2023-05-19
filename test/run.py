@@ -102,7 +102,7 @@ create_relation_tuple(namespace, 'Org2', relation, subject_set=ss)
 ## The relation of viewer is directly with the Org, so Bob will be able to see all Projects from the Organization.
 relation = 'viewers'
 ss.object = 'Bob'
-# First we create the Parent relationship: Organization <- User
+# First we create the Parent relationship: Organization <- Member using member-id [bob-member]
 create_relation_tuple("Member", "Bob-member", "parents", subject_set=SubjectSet(
     namespace="Organization",
     object="Org1",
