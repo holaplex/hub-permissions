@@ -4,3 +4,4 @@ target
 bundle.tar.gz
 policies/graphql/data.json
 .DS_Store
+schema.graphql

@@ -251,7 +251,22 @@ async fn process_member_added_event(
     .await?;
 
     info!("relation created {:?}", relation);
-
+    let relation = create_relationship(
+        &keto,
+        Some(&CreateRelationshipBody {
+            namespace: Some("User".to_string()),
+            object: Some(key.user_id.to_string()),
+            relation: Some("parents".to_string()),
+            subject_id: None,
+            subject_set: Some(Box::new(SubjectSet {
+                object: payload.organization_id.to_string(),
+                namespace: "Organization".to_string(),
+                relation: String::default(),
+            })),
+        }),
+    )
+    .await?;
+    info!("relation created {:?}", relation);
     Ok(())
 }
 
@@ -343,7 +358,21 @@ async fn process_member_deactivated_event(
     )
     .await?;
 
-    info!("relation deleted for user {:?}", key.user_id);
+    info!("User permissions relation deleted for user {:?}", key.user_id);
+
+    delete_relationships(
+        &keto,
+        Some("User"),
+        Some(&key.user_id),
+        Some("parents"),
+        None,
+        Some("Organization"),
+        Some(&payload.organization_id),
+        Some(""),
+    )
+    .await?;
+
+    info!("Org parent relation deleted for user {:?}", key.user_id);
 
     Ok(())
 }
