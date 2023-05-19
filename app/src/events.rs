@@ -250,12 +250,12 @@ async fn process_member_added_event(
     )
     .await?;
 
-    info!("relation created {:?}", relation);
+    info!("Org User Permission relation created {:?}", relation);
     let relation = create_relationship(
         &keto,
         Some(&CreateRelationshipBody {
             namespace: Some("User".to_string()),
-            object: Some(key.user_id.to_string()),
+            object: Some(key.id.to_string()),
             relation: Some("parents".to_string()),
             subject_id: None,
             subject_set: Some(Box::new(SubjectSet {
@@ -266,7 +266,7 @@ async fn process_member_added_event(
         }),
     )
     .await?;
-    info!("relation created {:?}", relation);
+    info!("Org Member Parent relation created {:?}", relation);
     Ok(())
 }
 
