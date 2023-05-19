@@ -8,14 +8,14 @@ services:
     command: serve -c /home/ory/keto.yml
     restart: on-failure
     environment:
-      - NAMESPACES_LOCATION=file:///home/ory/namespaces.keto.ts
+      - NAMESPACES_LOCATION=file:///app/namespaces/namespaces.keto.ts
     volumes:
       - type: bind
-        source: config/keto.yml
+        source: test/config.yaml
         target: /home/ory/keto.yml
       - type: bind
-        source: ./namespaces.keto.ts
-        target: /home/ory/namespaces.keto.ts
+        source: namespaces.keto.ts
+        target: /app/namespaces/namespaces.keto.ts
   redpanda:
     image: redpandadata/redpanda:v23.1.1
     command:
