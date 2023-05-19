@@ -102,8 +102,8 @@ create_relation_tuple(namespace, 'Org2', relation, subject_set=ss)
 ## The relation of viewer is directly with the Org, so Bob will be able to see all Projects from the Organization.
 relation = 'viewers'
 ss.object = 'Bob'
-# First we create the Parent relationship: Organization <- User
-create_relation_tuple("User", "Bob", "parents", subject_set=SubjectSet(
+# First we create the Parent relationship: Organization <- Member using member-id [bob-member]
+create_relation_tuple("Member", "Bob-member", "parents", subject_set=SubjectSet(
     namespace="Organization",
     object="Org1",
 ))
@@ -427,42 +427,33 @@ x = check_relation_tuple(namespace, object, relation, subject_set=ss)
 assert x[1] == False
 
 print('------------------------------')
-print("[.] Testing Permissions: User -> Action -> User [Organization Member]")
+print("[.] Testing Permissions: User -> Action -> Member")
 print('------------------------------')
-
-## Can User Alice deactivate User Bob which is member of the same organization?
 ss.namespace = 'User'
+
+## Can User Alice edit User Bob which is member of the same organization?
 ss.object = 'Alice'
-action = 'deactivate'
-namespace = 'User'
-object = 'Bob'
+action = 'edit'
+namespace = 'Member'
+object = 'Bob-member'
 x = check_relation_tuple(namespace, object, action, subject_set=ss)
 assert x[1] == True
 
-## Can User Alice deactivate User John which is member of a different organization
+## Can User Alice edit Member John which is member of a different organization
 ss.object = 'Alice'
-action = 'deactivate'
-namespace = 'User'
-object = 'John'
+action = 'edit'
+namespace = 'Member'
+object = 'John-member'
 x = check_relation_tuple(namespace, object, action, subject_set=ss)
 assert x[1] == False
 
-## Can User Bob deactivate User Alice, which is the owner of the organization
+## Can User Bob edit User Alice, which is the owner of the organization
 ss.object = 'Bob'
 action = 'deactivate'
 namespace = 'User'
-object = 'Alice'
+object = 'Alice-member'
 x = check_relation_tuple(namespace, object, action, subject_set=ss)
 assert x[1] == False
-
-## Can User Alice reactivate User Bob which is no longer member?
-ss.object = 'Alice'
-ss.namespace = 'User'
-action = 'reactivate'
-namespace = 'User'
-object = 'Bob'
-x = check_relation_tuple(namespace, object, action, subject_set=ss)
-assert x[1] == True
 
 ## Alice makes Bob an owner of Org1
 print('------------------------------')

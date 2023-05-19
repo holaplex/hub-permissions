@@ -200,14 +200,14 @@ permission:
     object:
       - input
       - id
-    action: reactivate
-    namespace: User
+    action: edit
+    namespace: Member
   deactivateMember:
     object:
       - input
       - id
-    action: deactivate
-    namespace: User
+    action: edit
+    namespace: Member
   retryMint:
     object:
       - input

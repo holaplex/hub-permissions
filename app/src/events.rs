@@ -250,12 +250,12 @@ async fn process_member_added_event(
     )
     .await?;
 
-    info!("relation created {:?}", relation);
+    info!("Org User Permission relation created {:?}", relation);
     let relation = create_relationship(
         &keto,
         Some(&CreateRelationshipBody {
-            namespace: Some("User".to_string()),
-            object: Some(key.user_id.to_string()),
+            namespace: Some("Member".to_string()),
+            object: Some(key.id.to_string()),
             relation: Some("parents".to_string()),
             subject_id: None,
             subject_set: Some(Box::new(SubjectSet {
@@ -266,7 +266,7 @@ async fn process_member_added_event(
         }),
     )
     .await?;
-    info!("relation created {:?}", relation);
+    info!("Org Member Parent relation created {:?}", relation);
     Ok(())
 }
 
@@ -359,7 +359,7 @@ async fn process_member_deactivated_event(
     .await?;
 
     info!(
-        "User permissions relation deleted for user {:?}",
+        "User permission relation deleted for user {:?}",
         key.user_id
     );
     Ok(())
@@ -386,7 +386,7 @@ async fn process_member_reactivated_event(
     )
     .await?;
 
-    info!("relation created {:?}", relation);
+    info!("User Permission relation created {:?}", relation);
     Ok(())
 }
 async fn process_nfts_mint_drop_event(
