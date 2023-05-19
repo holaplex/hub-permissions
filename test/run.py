@@ -81,7 +81,7 @@ def check_relation_tuple(
 
 
 
-### 
+###
 print('------------------------------')
 print("[.] Creating relations User -> Org")
 print('------------------------------')
@@ -89,7 +89,7 @@ namespace = "Organization"
 ss = SubjectSet(
     namespace='User',
     object='Alice',
-    relation='session',
+    relation='',
 )
 
 ## Alice creates 2 organizations, Org1 and Org2, so its relation to both orgs is owners
@@ -102,6 +102,12 @@ create_relation_tuple(namespace, 'Org2', relation, subject_set=ss)
 ## The relation of viewer is directly with the Org, so Bob will be able to see all Projects from the Organization.
 relation = 'viewers'
 ss.object = 'Bob'
+# First we create the Parent relationship: Organization <- User
+create_relation_tuple("User", "Bob", "parents", subject_set=SubjectSet(
+    namespace="Organization",
+    object="Org1",
+))
+# Then We create the Permission relationship, which is viewers
 create_relation_tuple(namespace, 'Org1', relation, subject_set=ss)
 
 ## John is a new user, unrelated to Alice or Bob.
@@ -118,13 +124,12 @@ create_relation_tuple('Project', 'JohnProject', relation, subject_set=ss)
 ## The relation of viewer is directly with the Org, so Bob will be able to see all Projects from the Organization.
 relation = 'editors'
 ss.object = 'api_token'
-ss.relation = 'oauth2'
 create_relation_tuple(namespace, 'Org1', relation, subject_set=ss)
 
 print('------------------------------')
 print("[.] Creating parent relations Org <- Project")
 print('------------------------------')
-## Alice creates project 'Project1' under 'Org1', so all members of Org1 will inherit the same permissions in this project. 
+## Alice creates project 'Project1' under 'Org1', so all members of Org1 will inherit the same permissions in this project.
 ## The relation of Project1 to Org1 is 'parents'.
 create_relation_tuple("Project", "Project1", "parents", subject_set=SubjectSet(
     namespace="Organization",
@@ -162,13 +167,13 @@ print('------------------------------')
 ss = SubjectSet(
     namespace='User',
     object='Bob',
-    relation='session',
+    relation='',
 )
 namespace = "Mint"
 object = "Mint1"
 
 ## Can User Bob transferAsset / retryMint from Org1/Project1/Drop1 ?
-action = 'edit' 
+action = 'edit'
 x = check_relation_tuple(namespace, object, action, subject_set=ss)
 assert x[1] == False
 
@@ -177,12 +182,12 @@ assert x[1] == False
 ss = SubjectSet(
     namespace='User',
     object='Alice',
-    relation='session',
+    relation='',
 )
 namespace = "Mint"
 object = "Mint1"
 
-action = 'edit' 
+action = 'edit'
 x = check_relation_tuple(namespace, object, action, subject_set=ss)
 assert x[1] == True
 
@@ -194,7 +199,7 @@ print('------------------------------')
 ss = SubjectSet(
     namespace='User',
     object='Bob',
-    relation='session',
+    relation='',
 )
 namespace = "Drop"
 object = "Drop1"
@@ -212,7 +217,7 @@ print('------------------------------')
 ss = SubjectSet(
     namespace='User',
     object='Bob',
-    relation='session',
+    relation='',
 )
 namespace = "Project"
 object = "Project1"
@@ -274,7 +279,6 @@ assert x[1] == False
 
 ## Can User api_token view Project JohnProject?
 ss.object = 'api_token'
-ss.relation = 'oauth2'
 x = check_relation_tuple(namespace, object, action, subject_set=ss)
 assert x[1] == False
 
@@ -286,7 +290,6 @@ print('------------------------------')
 ss.object = 'Alice'
 action = 'view'
 namespace = 'Organization'
-ss.relation = 'session'
 object = 'Org1'
 x = check_relation_tuple(namespace, object, action, subject_set=ss)
 assert x[1] == True
@@ -303,7 +306,6 @@ assert x[1] == False
 
 ## Can User api_token view Organization Org1?
 ss.object = 'api_token'
-ss.relation = 'oauth2'
 x = check_relation_tuple(namespace, object, action, subject_set=ss)
 assert x[1] == True
 
@@ -319,7 +321,6 @@ assert x[1] == True
 
 ## Can User John invite people to Organization Org1?
 ss.object = 'John'
-ss.relation = 'session'
 x = check_relation_tuple(namespace, object, action, subject_set=ss)
 assert x[1] == False
 
@@ -363,7 +364,7 @@ assert x[1] == True
 ## Can User Alice edit Organization JohnOrg?
 ss.object = 'Alice'
 x = check_relation_tuple(namespace, object, action, subject_set=ss)
-assert x[1] == False 
+assert x[1] == False
 
 ## Can User Alice delete Organization JohnOrg?
 action = 'delete'
@@ -425,6 +426,44 @@ object = 'Project1'
 x = check_relation_tuple(namespace, object, relation, subject_set=ss)
 assert x[1] == False
 
+print('------------------------------')
+print("[.] Testing Permissions: User -> Action -> User [Organization Member]")
+print('------------------------------')
+
+## Can User Alice deactivate User Bob which is member of the same organization?
+ss.namespace = 'User'
+ss.object = 'Alice'
+action = 'deactivate'
+namespace = 'User'
+object = 'Bob'
+x = check_relation_tuple(namespace, object, action, subject_set=ss)
+assert x[1] == True
+
+## Can User Alice deactivate User John which is member of a different organization
+ss.object = 'Alice'
+action = 'deactivate'
+namespace = 'User'
+object = 'John'
+x = check_relation_tuple(namespace, object, action, subject_set=ss)
+assert x[1] == False
+
+## Can User Bob deactivate User Alice, which is the owner of the organization
+ss.object = 'Bob'
+action = 'deactivate'
+namespace = 'User'
+object = 'Alice'
+x = check_relation_tuple(namespace, object, action, subject_set=ss)
+assert x[1] == False
+
+## Can User Alice reactivate User Bob which is no longer member?
+ss.object = 'Alice'
+ss.namespace = 'User'
+action = 'reactivate'
+namespace = 'User'
+object = 'Bob'
+x = check_relation_tuple(namespace, object, action, subject_set=ss)
+assert x[1] == True
+
 ## Alice makes Bob an owner of Org1
 print('------------------------------')
 print("[.] Changing permissions User -> Org relation.")
@@ -434,7 +473,7 @@ print('------------------------------')
 ss = SubjectSet(
     namespace='User',
     object='Bob',
-    relation='session',
+    relation='',
 )
 relation = 'owners'
 namespace = "Organization"

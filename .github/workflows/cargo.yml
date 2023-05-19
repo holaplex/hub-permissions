@@ -1,11 +1,22 @@
 name: Cargo
 
-on: [push, pull_request]
-jobs:
+on:
+  push:
+    branches:
+      - main
+      - release
+  pull_request:
+    branches:
+      - "**"
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
   clippy:
     name: clippy/check/doc
-    runs-on: self-hosted
+    runs-on: amd64
     steps:
       - name: Install dependencies
         run: |
@@ -26,6 +37,7 @@ jobs:
             toolchain: nightly-2022-12-11
             override: true
             components: rustfmt, clippy
+
       - uses: tespkg/actions-cache@v1
         with:
           accessKey: ${{ secrets.AWS_CACHE_ACCESS_KEY_ID }}
@@ -37,7 +49,7 @@ jobs:
             ~/.cargo/registry/cache/
             ~/.cargo/git/db/
             target/
-          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock', 'rust-toolchain.toml') }}-v1
+          key: ${{ github.event.repository.name }}-${{ runner.arch }}-cargo-clippy-${{ hashFiles('**/Cargo.lock', 'rust-toolchain.toml') }}
 
       - name: cargo clippy
         uses: actions-rs/cargo@v1
