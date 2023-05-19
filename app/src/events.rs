@@ -358,7 +358,10 @@ async fn process_member_deactivated_event(
     )
     .await?;
 
-    info!("User permissions relation deleted for user {:?}", key.user_id);
+    info!(
+        "User permissions relation deleted for user {:?}",
+        key.user_id
+    );
 
     delete_relationships(
         &keto,
