@@ -12,7 +12,7 @@ concurrency:
 env:
   SERVICE_NAME: permissions
   DOCKERHUB_REPO: ${{ vars.DOCKERHUB_ORG }}/${{ github.event.repository.name }}
-  CACHE_CONFIG: type=s3,region=${{ vars.AWS_REGION }},bucket=${{ vars.AWS_BUCKET }},access_key_id=${{ secrets.AWS_ACCESS_KEY_ID }},secret_access_key=${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  CACHE_CONFIG: type=s3,region=${{ vars.AWS_CACHE_REGION }},bucket=${{ vars.AWS_CACHE_BUCKET }},access_key_id=${{ secrets.AWS_CACHE_ACCESS_KEY_ID }},secret_access_key=${{ secrets.AWS_CACHE_SECRET_ACCESS_KEY }}
 
 
 jobs:
@@ -46,9 +46,9 @@ jobs:
       -
         uses: aws-actions/configure-aws-credentials@v1
         with:
-          aws-region: ${{ vars.AWS_REGION }}
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ vars.AWS_CACHE_REGION }}
+          aws-access-key-id: ${{ secrets.AWS_CACHE_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_CACHE_SECRET_ACCESS_KEY }}
       -
         name: Build and push ${{ github.event.repository.name }}
         uses: docker/build-push-action@v3
