@@ -1,5 +1,16 @@
 name: Keto relations test
-on: [push, pull_request]
+on:
+  push:
+    branches:
+      - main
+      - release
+  pull_request:
+    branches:
+      - "**"
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   test:
@@ -9,7 +20,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Create docker network  
+      - name: Create docker network
         run: docker network create keto
 
       - name: Setup docker
@@ -32,13 +43,13 @@ jobs:
 
           # alias for shorter docker commands
           alias keto='docker exec keto keto --config /etc/keto.yaml'
-         
+
           # wait for the container to be up
           while [[ -z $(docker ps | grep keto) ]];do
             echo Waiting for Keto container
             sleep 5
           done
- 
+
           # Run migrations
           keto migrate up --yes
 
@@ -48,4 +59,3 @@ jobs:
       - name: Run relations test
         run: |
           python3 test/run.py
-      

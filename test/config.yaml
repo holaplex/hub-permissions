@@ -3,11 +3,13 @@ version: v0.11.0-alpha.0
 log:
   format: json
   leak_sensitive_values: false
-  level: info
+  level: debug
 namespaces:
   location: file:///app/namespaces/
 serve:
   read:
+    host: 0.0.0.0
     port: 4466
   write:
+    host: 0.0.0.0
     port: 4467

@@ -1,6 +1,21 @@
 import { Namespace, Context } from "@ory/keto-namespace-types"
 class User implements Namespace {}
 
+class Member implements Namespace {
+  related: {
+    parents: Organization[]
+  }
+
+  permits = {
+    view: (ctx: Context): boolean =>
+      this.related.parents.traverse((parent) => parent.permits.view(ctx)),
+    edit: (ctx: Context): boolean =>
+      this.related.parents.traverse((parent) => parent.permits.delete(ctx)),
+    delete: (ctx: Context): boolean =>
+      this.related.parents.traverse((parent) => parent.permits.delete(ctx)),
+  }
+}
+
 class Webhook implements Namespace {
   related: {
     owners: User[]
@@ -157,8 +172,7 @@ class Organization implements Namespace {
     invite: (ctx: Context): boolean =>
       this.permits.view(ctx),
     delete: (ctx: Context): boolean =>
-      this.related.owners.includes(ctx.subject) || 
+      this.related.owners.includes(ctx.subject) ||
       this.related.parents.traverse((parent) => parent.permits.delete(ctx)),
   }
 }
-

@@ -38,7 +38,7 @@ pub async fn process(msg: Services, keto: Configuration) -> Result<()> {
                 process_member_deactivated_event(keto, key, payload).await
             },
             Some(organization_events::Event::MemberReactivated(payload)) => {
-                process_member_added_event(keto, key, payload).await
+                process_member_reactivated_event(keto, key, payload).await
             },
             Some(_) | None => Ok(()),
         },
@@ -250,8 +250,23 @@ async fn process_member_added_event(
     )
     .await?;
 
-    info!("relation created {:?}", relation);
-
+    info!("Org User Permission relation created {:?}", relation);
+    let relation = create_relationship(
+        &keto,
+        Some(&CreateRelationshipBody {
+            namespace: Some("Member".to_string()),
+            object: Some(key.id.to_string()),
+            relation: Some("parents".to_string()),
+            subject_id: None,
+            subject_set: Some(Box::new(SubjectSet {
+                object: payload.organization_id.to_string(),
+                namespace: "Organization".to_string(),
+                relation: String::default(),
+            })),
+        }),
+    )
+    .await?;
+    info!("Org Member Parent relation created {:?}", relation);
     Ok(())
 }
 
@@ -343,11 +358,37 @@ async fn process_member_deactivated_event(
     )
     .await?;
 
-    info!("relation deleted for user {:?}", key.user_id);
-
+    info!(
+        "User permission relation deleted for user {:?}",
+        key.user_id
+    );
     Ok(())
 }
 
+async fn process_member_reactivated_event(
+    keto: Configuration,
+    key: OrganizationEventKey,
+    payload: Member,
+) -> Result<()> {
+    let relation = create_relationship(
+        &keto,
+        Some(&CreateRelationshipBody {
+            namespace: Some("Organization".to_string()),
+            object: Some(payload.organization_id.to_string()),
+            relation: Some("editors".to_string()),
+            subject_id: None,
+            subject_set: Some(Box::new(SubjectSet {
+                object: key.user_id.to_string(),
+                namespace: "User".to_string(),
+                relation: String::default(),
+            })),
+        }),
+    )
+    .await?;
+
+    info!("User Permission relation created {:?}", relation);
+    Ok(())
+}
 async fn process_nfts_mint_drop_event(
     keto: Configuration,
     key: NftEventKey,
