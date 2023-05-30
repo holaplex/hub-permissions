@@ -211,7 +211,7 @@ permission:
   retryMint:
     object:
       - input
-      - mint_id
+      - id
     action: edit
     namespace: Mint
   transferAsset:
