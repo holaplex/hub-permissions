@@ -15,7 +15,7 @@ default allow := false
 
 skip_authz {
   # Skip Authz only if All queries and mutations in the operation have skip: true mapped
-  a := [v | 
+  a := [v |
     s := selections[_]
       v := permission[s].skip
       v == true
