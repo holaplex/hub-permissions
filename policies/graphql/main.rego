@@ -6,7 +6,6 @@ import future.keywords.in
 import data.hub.utils.helpers.get_object_id
 import data.hub.graphql.lib.query_definitions
 import data.hub.graphql.lib.mutation_definitions
-import data.hub.graphql.lib.mutation_arguments
 import data.hub.utils.keto.check_relation
 import data.hub.utils.keto.build_objects as keto
 import data.hub.graphql.lib.selections
