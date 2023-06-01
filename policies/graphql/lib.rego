@@ -51,19 +51,18 @@ known_types[t] {
 query_types[t] := properties {
     t := known_types[_]
     frag_props := {p | p := inline_fragments[_][t][_]}
-    field_props := {p | 
+    field_props := {p |
       query_fields[_]["__type__"] = t
       query_fields[_][p]
       p != "__type__"}
-    # print(field_props)
-    
+
     properties := {p:{}|  c := frag_props | field_props; p := c[_]}
 }
 
 inline_fragments[sub] {
   [_,node] := walk(query_definitions)
   node.TypeCondition
-  sub := {type:fields | 
+  sub := {type:fields |
     type := node.TypeCondition
     fields := [n | n := node.SelectionSet[_].Name]
   }
@@ -111,7 +110,7 @@ get_value(value) = children {
 
 query_definitions = d {
   ast
-  d := [o | 
+  d := [o |
     ast[a].Operations[i].Operation in ["query", "subscription"]
     o := ast[a].Operations[i]
     ]
@@ -119,7 +118,7 @@ query_definitions = d {
 
 mutation_definitions = d {
   ast
-  d := [d | 
+  d := [d |
     ast[a].Operations[i].Operation == "mutation"
     d := ast[a].Operations[i]
     ]
@@ -130,7 +129,7 @@ query_fields := fs {
   flds := [v |
     [_,node] := walk(query_definitions)
 
-    sub := {{name:type} | 
+    sub := {{name:type} |
       name := node.SelectionSet[i].Name
       type := get_type_from_definition(node.SelectionSet[i].Definition)
       }
@@ -147,7 +146,7 @@ mutation_fields := fs {
 
     [_,node] := walk(mutation_definitions)
 
-    sub := {{name:type} | 
+    sub := {{name:type} |
       name := node.SelectionSet[i].Name
       type := get_type_from_definition(node.SelectionSet[i].Definition)
       }

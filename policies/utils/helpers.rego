@@ -24,9 +24,8 @@ get_object_id(s, p) := id {
 get_object_id(s, p) := id {
   input.graphql.operation == "mutation"
   var_name := mutation_arguments[s][p[0]]
-  id := object.get(input.graphql.variables, [var_name, p[1] ], null)
+  id := object.get(input.graphql.variables, [var_name, p[1]], null)
+  not id == null
 } else := id {
-  id := object.get(mutation_arguments[s], p, null)
+  id := object.get(mutation_arguments[s], [p[0], p[1]], null)
 }
-
-
