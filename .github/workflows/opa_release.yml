@@ -1,7 +1,9 @@
 name: Test policies, build bundle and upload
-on: 
+on:
   push:
-    branches: [ main ]
+    branches:
+      - main
+      - release
   workflow_dispatch:
 
 jobs:
@@ -20,6 +22,17 @@ jobs:
     - name: Run OPA Tests
       run: opa test policies -v
 
+    - name: Setup Apollo Studio variant
+      id: vars
+      run: |
+        if [[ "${{ github.ref }}" == "refs/heads/release" ]]; then
+          echo "variant=current" >> $GITHUB_OUTPUT
+          echo "environment=prod" >> $GITHUB_OUTPUT
+        else
+          echo "variant=stage" >> $GITHUB_OUTPUT
+          echo "environment=stage" >> $GITHUB_OUTPUT
+        fi
+
     - name: Retrieve latest GraphQL Schema
       env:
         APOLLO_KEY: ${{ secrets.APOLLO_KEY }}
@@ -28,7 +41,7 @@ jobs:
         curl -sSL https://rover.apollo.dev/nix/latest | sh
         export PATH="/home/runner/.rover/bin:$PATH"
         # Retrieve and save schema
-        rover graph fetch hub-dev@current --skip-update-check --output plain > schema.graphql
+        rover graph fetch hub-dev@${{ steps.vars.outputs.variant }} --skip-update-check --format plain > schema.graphql
 
     - name: Build bundle
       if: success()
@@ -36,7 +49,7 @@ jobs:
         json_schema_path=policies/graphql/data.json
         schema_raw=$(python3 clean-schema.py schema.graphql) && \
         jq --null-input --arg data "$schema_raw" '.schema |= $data' > "$json_schema_path" && \
-        opa build -b policies 
+        opa build -b policies
 
     - name: Upload bundle
       if: success()
@@ -44,7 +57,7 @@ jobs:
       with:
         command: cp
         source: ./bundle.tar.gz
-        destination: s3://${{ secrets.AWS_BUCKET }}/bundle.tar.gz
+        destination: s3://${{ steps.vars.outputs.environment }}-${{ github.event.repository.name }}/bundle.tar.gz
         aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
         aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws_region: ${{ secrets.AWS_REGION }} 
+        aws_region: ${{ secrets.AWS_REGION }}
