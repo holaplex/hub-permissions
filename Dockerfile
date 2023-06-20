@@ -14,7 +14,12 @@ RUN apt-get update -y && \
   && \
   rm -rf /var/lib/apt/lists/*
 
+COPY ci/get-protoc.sh ./
+RUN chmod +x get-protoc.sh
+RUN /app/get-protoc.sh
+
 FROM chef AS planner
+
 COPY Cargo.* ./
 COPY app app
 RUN cargo chef prepare --recipe-path recipe.json
