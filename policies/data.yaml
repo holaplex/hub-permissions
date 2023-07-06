@@ -208,6 +208,12 @@ permission:
       - id
     action: edit
     namespace: Member
+  retryDrop:
+    object:
+      - input
+      - drop
+    action: edit
+    namespace: Drop
   retryMint:
     object:
       - input
