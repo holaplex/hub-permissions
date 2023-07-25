@@ -10,9 +10,9 @@ use ory_keto_client::{
 use crate::{
     proto::{
         credential_events, customer_events, nft_events, organization_events, webhook_events,
-        CreationStatus, CredentialEventKey, Customer, CustomerEventKey, DropCreation, Member,
-        MintCreation, NftEventKey, OAuth2Client, OrganizationEventKey, Project, Webhook,
-        WebhookEventKey,
+        CollectionCreation, CreationStatus, CredentialEventKey, Customer, CustomerEventKey,
+        DropCreation, Member, MintCollectionCreation, MintCreation, NftEventKey, OAuth2Client,
+        OrganizationEventKey, Project, Webhook, WebhookEventKey,
     },
     Services,
 };
@@ -75,6 +75,12 @@ pub async fn process(msg: Services, keto: Configuration) -> Result<()> {
             },
             Some(nft_events::Event::DropCreated(payload)) => {
                 process_drop_created_event(keto, key, payload).await
+            },
+            Some(nft_events::Event::CollectionCreated(payload)) => {
+                process_collection_created_event(keto, key, payload).await
+            },
+            Some(nft_events::Event::MintedToCollection(payload)) => {
+                process_nfts_mint_to_collection_event(keto, key, payload).await
             },
             Some(_) | None => Ok(()),
         },
@@ -217,6 +223,39 @@ async fn process_drop_created_event(
         &keto,
         Some(&CreateRelationshipBody {
             namespace: Some("Drop".to_string()),
+            object: Some(key.id.to_string()),
+            relation: Some("parents".to_string()),
+            subject_id: None,
+            subject_set: Some(Box::new(SubjectSet {
+                object: key.project_id.to_string(),
+                namespace: "Project".to_string(),
+                relation: String::default(),
+            })),
+        }),
+    )
+    .await?;
+
+    info!("relation created {:?}", relation);
+
+    Ok(())
+}
+
+async fn process_collection_created_event(
+    keto: Configuration,
+    key: NftEventKey,
+    payload: CollectionCreation,
+) -> Result<()> {
+    let status =
+        CreationStatus::from_i32(payload.status).ok_or(anyhow!("creation status not found"))?;
+
+    if status == CreationStatus::Completed || status == CreationStatus::Failed {
+        return Ok(());
+    }
+
+    let relation = create_relationship(
+        &keto,
+        Some(&CreateRelationshipBody {
+            namespace: Some("Collection".to_string()),
             object: Some(key.id.to_string()),
             relation: Some("parents".to_string()),
             subject_id: None,
@@ -394,6 +433,7 @@ async fn process_member_reactivated_event(
     info!("User Permission relation created {:?}", relation);
     Ok(())
 }
+
 async fn process_nfts_mint_drop_event(
     keto: Configuration,
     key: NftEventKey,
@@ -416,6 +456,39 @@ async fn process_nfts_mint_drop_event(
             subject_set: Some(Box::new(SubjectSet {
                 object: payload.drop_id.to_string(),
                 namespace: "Drop".to_string(),
+                relation: String::default(),
+            })),
+        }),
+    )
+    .await?;
+
+    info!("relation created {:?}", relation);
+
+    Ok(())
+}
+
+async fn process_nfts_mint_to_collection_event(
+    keto: Configuration,
+    key: NftEventKey,
+    payload: MintCollectionCreation,
+) -> Result<()> {
+    let status =
+        CreationStatus::from_i32(payload.status).ok_or(anyhow!("creation status not found"))?;
+
+    if status == CreationStatus::Completed || status == CreationStatus::Failed {
+        return Ok(());
+    }
+
+    let relation = create_relationship(
+        &keto,
+        Some(&CreateRelationshipBody {
+            namespace: Some("Mint".to_string()),
+            object: Some(key.id.to_string()),
+            relation: Some("parents".to_string()),
+            subject_id: None,
+            subject_set: Some(Box::new(SubjectSet {
+                object: payload.collection_id.to_string(),
+                namespace: "Collection".to_string(),
                 relation: String::default(),
             })),
         }),

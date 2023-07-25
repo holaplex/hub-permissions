@@ -161,6 +161,36 @@ permission:
       - customer
     action: edit
     namespace: Customer
+  createCollection:
+    object:
+      - input
+      - project
+    action: edit
+    namespace: Project
+  retryCollection:
+    object:
+      - input
+      - id
+    action: edit
+    namespace: Collection
+  patchCollection:
+    object:
+      - input
+      - id
+    action: edit
+    namespace: Collection
+  mintToCollection:
+    object:
+      - input
+      - collection
+    action: edit
+    namespace: Collection
+  retryMintToCollection:
+    object:
+      - input
+      - id
+    action: edit
+    namespace: Mint
   drop:
     object:
       - id
@@ -214,7 +244,7 @@ permission:
       - drop
     action: edit
     namespace: Drop
-  retryMint:
+  retryMintEdition  :
     object:
       - input
       - id
