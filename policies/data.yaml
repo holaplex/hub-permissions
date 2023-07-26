@@ -167,6 +167,12 @@ permission:
       - project
     action: edit
     namespace: Project
+  importSolanaCollection:
+    object:
+      - input
+      - project
+    action: edit
+    namespace: Project
   retryCollection:
     object:
       - input
