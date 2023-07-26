@@ -9,10 +9,11 @@ use ory_keto_client::{
 
 use crate::{
     proto::{
-        credential_events, customer_events, nft_events, organization_events, webhook_events,
-        CollectionCreation, CreationStatus, CredentialEventKey, Customer, CustomerEventKey,
-        DropCreation, Member, MintCollectionCreation, MintCreation, NftEventKey, OAuth2Client,
-        OrganizationEventKey, Project, Webhook, WebhookEventKey,
+        credential_events, customer_events, nft_events, organization_events, solana_nft_events,
+        webhook_events, CollectionCreation, CreationStatus, CredentialEventKey, Customer,
+        CustomerEventKey, DropCreation, Member, MintCollectionCreation, MintCreation, NftEventKey,
+        OAuth2Client, OrganizationEventKey, Project, SolanaMintPayload, SolanaNftEventKey, Webhook,
+        WebhookEventKey,
     },
     Services,
 };
@@ -81,6 +82,15 @@ pub async fn process(msg: Services, keto: Configuration) -> Result<()> {
             },
             Some(nft_events::Event::MintedToCollection(payload)) => {
                 process_nfts_mint_to_collection_event(keto, key, payload).await
+            },
+            Some(_) | None => Ok(()),
+        },
+        Services::SolanaNfts(key, payload) => match payload.event {
+            Some(solana_nft_events::Event::ImportedExternalCollection(_)) => {
+                process_solana_collection_imported_event(keto, key).await
+            },
+            Some(solana_nft_events::Event::ImportedExternalMint(payload)) => {
+                process_solana_mint_imported_event(keto, key, payload).await
             },
             Some(_) | None => Ok(()),
         },
@@ -273,6 +283,55 @@ async fn process_collection_created_event(
     Ok(())
 }
 
+async fn process_solana_collection_imported_event(
+    keto: Configuration,
+    key: SolanaNftEventKey,
+) -> Result<()> {
+    let relation = create_relationship(
+        &keto,
+        Some(&CreateRelationshipBody {
+            namespace: Some("Collection".to_string()),
+            object: Some(key.id.to_string()),
+            relation: Some("parents".to_string()),
+            subject_id: None,
+            subject_set: Some(Box::new(SubjectSet {
+                object: key.project_id.to_string(),
+                namespace: "Project".to_string(),
+                relation: String::default(),
+            })),
+        }),
+    )
+    .await?;
+
+    info!("relation created {:?}", relation);
+
+    Ok(())
+}
+async fn process_solana_mint_imported_event(
+    keto: Configuration,
+    key: SolanaNftEventKey,
+    payload: SolanaMintPayload,
+) -> Result<()> {
+    let relation = create_relationship(
+        &keto,
+        Some(&CreateRelationshipBody {
+            namespace: Some("Mint".to_string()),
+            object: Some(key.id.to_string()),
+            relation: Some("parents".to_string()),
+            subject_id: None,
+            subject_set: Some(Box::new(SubjectSet {
+                object: payload.collection_id.to_string(),
+                namespace: "Collection".to_string(),
+                relation: String::default(),
+            })),
+        }),
+    )
+    .await?;
+
+    info!("relation created {:?}", relation);
+
+    Ok(())
+}
 async fn process_member_added_event(
     keto: Configuration,
     key: OrganizationEventKey,
