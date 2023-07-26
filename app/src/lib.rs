@@ -14,6 +14,7 @@ pub mod proto {
     include!(concat!(env!("OUT_DIR"), "/credential.proto.rs"));
     include!(concat!(env!("OUT_DIR"), "/webhook.proto.rs"));
     include!(concat!(env!("OUT_DIR"), "/nfts.proto.rs"));
+    include!(concat!(env!("OUT_DIR"), "/solana_nfts.proto.rs"));
 }
 
 #[derive(Debug)]
@@ -24,6 +25,7 @@ pub enum Services {
     Credentials(proto::CredentialEventKey, proto::CredentialEvents),
     Webhooks(proto::WebhookEventKey, proto::WebhookEvents),
     Nfts(proto::NftEventKey, proto::NftEvents),
+    SolanaNfts(proto::SolanaNftEventKey, proto::SolanaNftEvents),
 }
 
 impl hub_core::consumer::MessageGroup for Services {
@@ -34,6 +36,7 @@ impl hub_core::consumer::MessageGroup for Services {
         "hub-credentials",
         "hub-webhooks",
         "hub-nfts",
+        "hub-nfts-solana",
     ];
 
     fn from_message<M: hub_core::consumer::Message>(msg: &M) -> Result<Self, RecvError> {
