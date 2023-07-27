@@ -250,7 +250,7 @@ permission:
       - drop
     action: edit
     namespace: Drop
-  retryMintEdition  :
+  retryMintEdition:
     object:
       - input
       - id
