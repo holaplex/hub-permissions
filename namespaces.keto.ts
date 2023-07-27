@@ -90,7 +90,7 @@ class Mint implements Namespace {
     owners: User[]
     editors: User[]
     viewers: User[]
-    parents: Drop[]
+    parents: (Drop | Collection)[]
   }
 
   permits = {
@@ -109,6 +109,29 @@ class Mint implements Namespace {
 }
 
 class Drop implements Namespace {
+  related: {
+    owners: User[]
+    editors: User[]
+    viewers: User[]
+    parents: Project[]
+  }
+
+  permits = {
+    view: (ctx: Context): boolean =>
+      this.related.viewers.includes(ctx.subject) ||
+      this.related.parents.traverse((parent) => parent.permits.view(ctx)) ||
+      this.permits.edit(ctx),
+    edit: (ctx: Context): boolean =>
+      this.related.editors.includes(ctx.subject) ||
+      this.related.parents.traverse((parent) => parent.permits.edit(ctx)) ||
+      this.permits.delete(ctx),
+    delete: (ctx: Context): boolean =>
+      this.related.owners.includes(ctx.subject) ||
+      this.related.parents.traverse((parent) => parent.permits.delete(ctx)),
+  }
+}
+
+class Collection implements Namespace {
   related: {
     owners: User[]
     editors: User[]
