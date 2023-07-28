@@ -82,6 +82,12 @@ impl hub_core::consumer::MessageGroup for Services {
 
                 Ok(Services::Nfts(key, val))
             },
+            "hub-nfts-solana" => {
+                let key = proto::SolanaNftEventKey::decode(key)?;
+                let val = proto::SolanaNftEvents::decode(val)?;
+
+                Ok(Services::SolanaNfts(key, val))
+            },
             t => Err(RecvError::BadTopic(t.into())),
         }
     }
