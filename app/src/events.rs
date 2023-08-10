@@ -12,8 +12,8 @@ use crate::{
         credential_events, customer_events, nft_events, organization_events, solana_nft_events,
         webhook_events, CollectionCreation, CreationStatus, CredentialEventKey, Customer,
         CustomerEventKey, DropCreation, Member, MintCollectionCreation, MintCreation, NftEventKey,
-        OAuth2Client, OrganizationEventKey, Project, SolanaMintPayload, SolanaNftEventKey, Webhook,
-        WebhookEventKey,
+        OAuth2Client, OrganizationEventKey, Project, SolanaMintPayload, SolanaNftEventKey,
+        SolanaUpdatedMintPayload, Webhook, WebhookEventKey,
     },
     Services,
 };
@@ -82,6 +82,9 @@ pub async fn process(msg: Services, keto: Configuration) -> Result<()> {
             },
             Some(nft_events::Event::MintedToCollection(payload)) => {
                 process_nfts_mint_to_collection_event(keto, key, payload).await
+            },
+            Some(nft_events::Event::SolanaMintUpdated(payload)) => {
+                process_solana_mint_updated(keto, key, payload).await
             },
             Some(_) | None => Ok(()),
         },
@@ -548,6 +551,32 @@ async fn process_nfts_mint_to_collection_event(
             subject_set: Some(Box::new(SubjectSet {
                 object: payload.collection_id.to_string(),
                 namespace: "Collection".to_string(),
+                relation: String::default(),
+            })),
+        }),
+    )
+    .await?;
+
+    info!("relation created {:?}", relation);
+
+    Ok(())
+}
+
+async fn process_solana_mint_updated(
+    keto: Configuration,
+    key: NftEventKey,
+    payload: SolanaUpdatedMintPayload,
+) -> Result<()> {
+    let relation = create_relationship(
+        &keto,
+        Some(&CreateRelationshipBody {
+            namespace: Some("UpdateHistories".to_string()),
+            object: Some(key.id),
+            relation: Some("parents".to_string()),
+            subject_id: None,
+            subject_set: Some(Box::new(SubjectSet {
+                object: payload.mint_id,
+                namespace: "Mint".to_string(),
                 relation: String::default(),
             })),
         }),
