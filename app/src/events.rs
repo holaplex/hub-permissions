@@ -570,7 +570,7 @@ async fn process_solana_mint_updated(
     let relation = create_relationship(
         &keto,
         Some(&CreateRelationshipBody {
-            namespace: Some("UpdateHistories".to_string()),
+            namespace: Some("UpdateHistory".to_string()),
             object: Some(key.id),
             relation: Some("parents".to_string()),
             subject_id: None,

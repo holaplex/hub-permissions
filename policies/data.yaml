@@ -262,3 +262,15 @@ permission:
       - id
     action: edit
     namespace: Mint
+  updateMint:
+    object:
+      - input
+      - id
+    action: edit
+    namespace: Mint
+  retryUpdateHistory:
+    object:
+      - input
+      - id
+    action: edit
+    namespace: UpdateHistory
