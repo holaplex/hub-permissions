@@ -268,7 +268,7 @@ permission:
       - id
     action: edit
     namespace: Mint
-  retryUpdateHistory:
+  retryUpdateMint:
     object:
       - input
       - revisionId
