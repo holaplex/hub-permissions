@@ -13,7 +13,7 @@ use crate::{
         webhook_events, CollectionCreation, CreationStatus, CredentialEventKey, Customer,
         CustomerEventKey, DropCreation, Member, MintCollectionCreation, MintCreation, NftEventKey,
         OAuth2Client, OrganizationEventKey, Project, SolanaMintPayload, SolanaNftEventKey,
-        SolanaUpdatedMintPayload, Webhook, WebhookEventKey,
+        UpdateSolanaMintPayload, Webhook, WebhookEventKey,
     },
     Services,
 };
@@ -83,7 +83,7 @@ pub async fn process(msg: Services, keto: Configuration) -> Result<()> {
             Some(nft_events::Event::MintedToCollection(payload)) => {
                 process_nfts_mint_to_collection_event(keto, key, payload).await
             },
-            Some(nft_events::Event::SolanaMintUpdated(payload)) => {
+            Some(nft_events::Event::SolanaUpdatedCollectionMint(payload)) => {
                 process_solana_mint_updated(keto, key, payload).await
             },
             Some(_) | None => Ok(()),
@@ -565,7 +565,7 @@ async fn process_nfts_mint_to_collection_event(
 async fn process_solana_mint_updated(
     keto: Configuration,
     key: NftEventKey,
-    payload: SolanaUpdatedMintPayload,
+    payload: UpdateSolanaMintPayload,
 ) -> Result<()> {
     let relation = create_relationship(
         &keto,
