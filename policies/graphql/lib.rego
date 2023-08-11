@@ -31,7 +31,6 @@ valid_query := graphql.is_valid(graphql_document, graphql_schema)
 
 valid_schema := graphql.schema_is_valid(graphql_schema)
 
-
 known_types[t] {
 	inline_fragments[_][t]
 }
@@ -80,7 +79,9 @@ query_arguments := a {
 		nested_selection := selection.SelectionSet[l]
 		count(nested_selection.Arguments) > 0
 		nfield := nested_selection.Alias
-		nvalue := {nested_selection.Arguments[m].Name: argument_value(nested_selection.Arguments[m].Value)}
+		nvalue := {
+      nested_selection.Arguments[m].Name: argument_value(nested_selection.Arguments[m].Value)
+      }
 	}
 
 	a := object.union(top_level_args, nested_args)
@@ -105,7 +106,9 @@ mutation_arguments := a {
 		nested_selection := selection.SelectionSet[l]
 		count(nested_selection.Arguments) > 0
 		nfield := nested_selection.Alias
-		nvalue := {nested_selection.Arguments[m].Name: argument_value(nested_selection.Arguments[m].Value)}
+		nvalue := {
+      nested_selection.Arguments[m].Name: argument_value(nested_selection.Arguments[m].Value)
+      }
 	}
 
 	a := object.union(top_level_args, nested_args)

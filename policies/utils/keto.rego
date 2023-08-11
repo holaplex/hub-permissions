@@ -1,28 +1,26 @@
 package hub.utils.keto
 
 import data.hub.graphql.lib.selections
+import data.hub.utils.helpers.headers
 import data.hub.utils.helpers.object_id
 import data.hub.utils.helpers.subject_id
-import data.hub.utils.helpers.headers
 import data.permission as authz
 
-build_objects := objs {
-	objs := [d |
-		selection := selections[_]
-		action := authz[selection].action
-		namespace := authz[selection].namespace
-		object := object_id(selection, authz[selection].object)
+build_objects := {[d |
+	selection := selections[_]
+	action := authz[selection].action
+	namespace := authz[selection].namespace
+	object := object_id(selection, authz[selection].object)
 
-		d := {
-			"namespace": namespace,
-			"object": object,
-			"selection": selection,
-			"action": action,
-			"subject_id": subject_id(),
-			"subject_ns": "User",
-		}
-	]
-}
+	d := {
+		"namespace": namespace,
+		"object": object,
+		"selection": selection,
+		"action": action,
+		"subject_id": subject_id(),
+		"subject_ns": "User",
+	}
+]}
 
 check_relation(x) := d {
 	url_query := urlquery.encode_object({
