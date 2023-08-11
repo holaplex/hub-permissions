@@ -271,6 +271,6 @@ permission:
   retryUpdateHistory:
     object:
       - input
-      - revision_id
+      - revisionId
     action: edit
     namespace: UpdateHistory
