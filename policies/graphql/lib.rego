@@ -23,7 +23,6 @@ selections := s {
 	]
 }
 
-
 inline_fragments[sub] {
 	[_, node] := walk(query_definitions)
 	node.TypeCondition
