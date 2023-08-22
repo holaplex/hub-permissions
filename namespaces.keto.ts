@@ -201,21 +201,22 @@ class Project implements Namespace {
 }
 
 class Organization implements Namespace {
-    related: {
-      owners: User[]
-      editors: User[]
-      viewers: User[]
-    }
+  related: {
+    owners: User[]
+    editors: User[]
+    viewers: User[]
+  }
 
-    permits = {
-      view: (ctx: Context): boolean =>
-        this.related.viewers.includes(ctx.subject) ||
-        this.permits.edit(ctx),
-      edit: (ctx: Context): boolean =>
-        this.related.editors.includes(ctx.subject) ||
-        this.related.owners.includes(ctx.subject) ||
-        this.permits.delete(ctx),
-      invite: (ctx: Context): boolean => this.permits.view(ctx),
-      delete: (ctx: Context): boolean => this.related.owners.includes(ctx.subject),
-    }
+  permits = {
+    view: (ctx: Context): boolean =>
+      this.related.viewers.includes(ctx.subject) ||
+      this.related.owners.includes(ctx.subject) ||
+      this.permits.edit(ctx),
+    edit: (ctx: Context): boolean =>
+      this.related.editors.includes(ctx.subject) ||
+      this.related.owners.includes(ctx.subject) ||
+      this.permits.delete(ctx),
+    invite: (ctx: Context): boolean => this.permits.view(ctx),
+    delete: (ctx: Context): boolean => this.related.owners.includes(ctx.subject),
+  }
 }
