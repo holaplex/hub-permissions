@@ -6,7 +6,7 @@ import data.hub.utils.helpers.object_id
 import data.hub.utils.helpers.subject_id
 import data.permission as authz
 
-build_objects := {[d |
+build_objects := [d |
 	selection := selections[_]
 	action := authz[selection].action
 	namespace := authz[selection].namespace
@@ -17,10 +17,10 @@ build_objects := {[d |
 		"object": object,
 		"selection": selection,
 		"action": action,
-		"subject_id": subject_id(),
+		"subject_id": subject_id,
 		"subject_ns": "User",
 	}
-]}
+]
 
 check_relation(x) := d {
 	url_query := urlquery.encode_object({
@@ -41,7 +41,7 @@ check_relation(x) := d {
 			"X-Request-Id": headers["x-request-id"],
 		},
 		"force_json_decode": true,
-		"force_cache": false,
+		"force_cache": true,
 		"force_cache_duration_seconds": 5,
 		"timeout": "2s",
 	})

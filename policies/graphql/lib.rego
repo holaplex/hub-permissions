@@ -21,35 +21,7 @@ selections := s {
 	]
 }
 
-schema := graphql.parse_schema(graphql_schema)
-
-query := graphql.parse_query(graphql_document)
-
 ast := graphql.parse(graphql_document, graphql_schema)
-
-valid_query := graphql.is_valid(graphql_document, graphql_schema)
-
-valid_schema := graphql.schema_is_valid(graphql_schema)
-
-known_types[t] {
-	inline_fragments[_][t]
-}
-
-known_types[t] {
-	t := query_fields[_][_]
-}
-
-query_types[t] := properties {
-	t := known_types[_]
-	frag_props := {p | p := inline_fragments[_][t][_]}
-	field_props := {p |
-		query_fields[_].__type__ = t
-		query_fields[_][p]
-		p != "__type__"
-	}
-
-	properties := {p: {} | c := frag_props | field_props; p := c[_]}
-}
 
 inline_fragments[sub] {
 	[_, node] := walk(query_definitions)
@@ -79,9 +51,7 @@ query_arguments := a {
 		nested_selection := selection.SelectionSet[l]
 		count(nested_selection.Arguments) > 0
 		nfield := nested_selection.Alias
-		nvalue := {
-      nested_selection.Arguments[m].Name: argument_value(nested_selection.Arguments[m].Value)
-      }
+		nvalue := {nested_selection.Arguments[m].Name: argument_value(nested_selection.Arguments[m].Value)}
 	}
 
 	a := object.union(top_level_args, nested_args)
@@ -106,9 +76,7 @@ mutation_arguments := a {
 		nested_selection := selection.SelectionSet[l]
 		count(nested_selection.Arguments) > 0
 		nfield := nested_selection.Alias
-		nvalue := {
-      nested_selection.Arguments[m].Name: argument_value(nested_selection.Arguments[m].Value)
-      }
+		nvalue := {nested_selection.Arguments[m].Name: argument_value(nested_selection.Arguments[m].Value)}
 	}
 
 	a := object.union(top_level_args, nested_args)
