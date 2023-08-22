@@ -32,7 +32,7 @@ object_id(s, p) := id if {
 	id := object.get(mutation_arguments[s], [p[0], p[1]], null)
 }
 
-decision(obj) if {
+valid(obj) if {
 	self_query(obj)
 } else if {
 	skip_authz(obj)
