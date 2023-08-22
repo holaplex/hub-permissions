@@ -23,15 +23,6 @@ selections := s {
 	]
 }
 
-inline_fragments[sub] {
-	[_, node] := walk(query_definitions)
-	node.TypeCondition
-	sub := {type: fields |
-		type := node.TypeCondition
-		fields := [n | n := node.SelectionSet[_].Name]
-	}
-}
-
 query_arguments := a {
 	ast
 	top_level_args := {name: args |
@@ -106,42 +97,4 @@ mutation_definitions := d {
 		ast[a].Operations[i].Operation == "mutation"
 		d := ast[a].Operations[i]
 	]
-}
-
-query_fields := fs {
-	ast
-	flds := [v |
-		[_, node] := walk(query_definitions)
-
-		sub := {{name: type} |
-			name := node.SelectionSet[i].Name
-			type := definition_type(node.SelectionSet[i].Definition)
-		}
-		count(sub) > 0
-
-		v := {node.Name: sub | {{"__type__": definition_type(node.Definition)}}}
-	]
-	fs := {f: a | flds[_][f]; a := {k: v | v := flds[_][f][_][k]}}
-}
-
-mutation_fields := fs {
-	ast
-	flds := [v |
-		[_, node] := walk(mutation_definitions)
-
-		sub := {{name: type} |
-			name := node.SelectionSet[i].Name
-			type := definition_type(node.SelectionSet[i].Definition)
-		}
-		count(sub) > 0
-
-		v := {node.Name: sub | {{"__type__": definition_type(node.Definition)}}}
-	]
-	fs := {f: a | flds[_][f]; a := {k: v | v := flds[_][f][_][k]}}
-}
-
-definition_type(definition) := t {
-	t := definition.Type.Elem.NamedType
-} else := t {
-	t := definition.Type.NamedType
 }
