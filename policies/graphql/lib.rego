@@ -5,6 +5,8 @@ import future.keywords.in
 
 graphql_document := input.graphql.query
 
+ast := graphql.parse(graphql_document, graphql_schema)
+
 selections := s {
 	input.graphql.operation == "query"
 	s := [alias |
@@ -15,13 +17,12 @@ selections := s {
 } else = s {
 	input.graphql.operation == "mutation"
 	s := [alias |
-		walk(query_definitions, [k, value])
+		walk(mutation_definitions, [k, value])
 		value.Arguments
 		alias := value.Alias
 	]
 }
 
-ast := graphql.parse(graphql_document, graphql_schema)
 
 inline_fragments[sub] {
 	[_, node] := walk(query_definitions)

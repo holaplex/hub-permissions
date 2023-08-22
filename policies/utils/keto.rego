@@ -22,7 +22,7 @@ build_objects := [d |
 	}
 ]
 
-check_relation(x) := d {
+valid_relation(x) := d {
 	url_query := urlquery.encode_object({
 		"namespace": x.namespace,
 		"object": x.object,
