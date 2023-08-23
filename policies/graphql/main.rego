@@ -13,6 +13,6 @@ allow if {
 }
 
 invalid := [sprintf("%v: %v", [relation.namespace, relation.object]) |
-    relation := keto[_]
-    not is_valid(relation)
+	relation := keto[_]
+	not is_valid(relation)
 ]
