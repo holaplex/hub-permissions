@@ -1,11 +1,8 @@
 package hub.graphql.lib
 
-import data.graphql.schema as graphql_schema
 import future.keywords.in
 
-graphql_document := input.graphql.query
-
-ast := graphql.parse(graphql_document, graphql_schema)
+ast := [graphql.parse_query(input.graphql.query)]
 
 selections := s {
 	input.graphql.operation == "query"

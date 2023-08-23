@@ -1,5 +1,6 @@
 package hub.graphql.main
 
+import data.hub.graphql.lib.ast
 import data.hub.graphql.lib.selections
 import data.hub.utils.helpers.is_valid
 import data.hub.utils.keto.build_objects as keto
@@ -7,16 +8,12 @@ import future.keywords.if
 
 default allow := false
 
-results := [x |
-	obj := keto[_]
-	x := is_valid(obj)
-]
-
 allow if {
-	count(selections) == count([x | x := results[_]; x == true])
+	valid_relations := {r | is_valid(keto[r])}
+	count(selections) == count(valid_relations)
 }
 
-parsed := {
-	"keto": keto,
-	"selections": selections,
-}
+invalid := [{"resource": relation.namespace, "id": relation.object} |
+	relation := keto[_]
+	not is_valid(relation)
+]
