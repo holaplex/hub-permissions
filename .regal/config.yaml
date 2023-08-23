@@ -1,0 +1,40 @@
+# Files can be excluded from all lint
+# rules according to glob-patterns
+ignore:
+  files:
+    - policies/data.yaml
+rules:
+  style:
+    function-arg-return:
+      # one of "error", "warning", "ignore"
+      level: error
+      # list of function names to ignore
+      # note that `print` is always ignored as it does not return a value
+      except-functions:
+        - walk
+    todo-comment:
+      # don't report on todo comments
+      level: ignore
+    line-length:
+      # custom rule configuration
+      max-line-length: 100
+      # warn on too long lines, but don't fail
+      level: warning
+    opa-fmt:
+      # not needed as error is the default, but
+      # being explicit won't hurt
+      level: error
+      # Files can be ignored.
+      # In this example, test files are ignored
+      ignore:
+        files:
+          - "*_test.rego"
+  custom:
+    # custom rule configuration
+    naming-convention:
+      level: error
+      conventions:
+        # ensure all package names start with "acmecorp" or "system"
+        - pattern: '^hub\.[a-z_\.]+$|^system\.[a-z_\.]+$'
+          targets:
+            - package

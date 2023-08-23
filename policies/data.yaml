@@ -197,6 +197,11 @@ permission:
       - id
     action: edit
     namespace: Mint
+  collection:
+    object:
+      - id
+    action: view
+    namespace: Collection
   drop:
     object:
       - id
