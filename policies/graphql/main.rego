@@ -1,6 +1,5 @@
 package hub.graphql.main
 
-import data.hub.graphql.lib.ast
 import data.hub.graphql.lib.selections
 import data.hub.utils.helpers.is_valid
 import data.hub.utils.keto.build_objects as keto
@@ -13,7 +12,7 @@ allow if {
 	count(selections) == count(valid_relations)
 }
 
-invalid := [{"resource": relation.namespace, "id": relation.object} |
-	relation := keto[_]
-	not is_valid(relation)
+invalid := [sprintf("%v: %v", [relation.namespace, relation.object]) |
+    relation := keto[_]
+    not is_valid(relation)
 ]
