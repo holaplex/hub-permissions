@@ -197,11 +197,26 @@ permission:
       - id
     action: edit
     namespace: Mint
+  collection:
+    object:
+      - id
+    action: view
+    namespace: Collection
   drop:
     object:
       - id
     action: view
     namespace: Drop
+  collection:
+    object:
+      - id
+    action: view
+    namespace: Collection
+  mint:
+    object:
+      - id
+    action: view
+    namespace: Mint
   mintEdition:
     object:
       - input
@@ -262,3 +277,15 @@ permission:
       - id
     action: edit
     namespace: Mint
+  updateMint:
+    object:
+      - input
+      - id
+    action: edit
+    namespace: Mint
+  retryUpdateMint:
+    object:
+      - input
+      - revisionId
+    action: edit
+    namespace: UpdateHistory
