@@ -289,3 +289,9 @@ permission:
       - revisionId
     action: edit
     namespace: UpdateHistory
+  switchCollection:
+    object:
+      - input
+      - mint
+    action: edit
+    namespace: Mint
