@@ -250,6 +250,24 @@ async fn process_drop_created_event(
 
     info!("relation created {:?}", relation);
 
+    let relation = create_relationship(
+        &keto,
+        Some(&CreateRelationshipBody {
+            namespace: Some("Collection".to_string()),
+            object: Some(payload.collection_id.to_string()),
+            relation: Some("parents".to_string()),
+            subject_id: None,
+            subject_set: Some(Box::new(SubjectSet {
+                object: key.project_id.to_string(),
+                namespace: "Project".to_string(),
+                relation: String::default(),
+            })),
+        }),
+    )
+    .await?;
+
+    info!("relation created {:?}", relation);
+
     Ok(())
 }
 
