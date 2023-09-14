@@ -295,3 +295,15 @@ permission:
       - mint
     action: edit
     namespace: Mint
+  mintQueued:
+    object:
+      - input
+      - mint
+    action: edit
+    namespace: Mint
+  mintRandomQueuedToDrop:
+    object:
+      - input
+      - drop
+    action: edit
+    namespace: Drop
