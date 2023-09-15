@@ -300,7 +300,7 @@ permission:
       - input
       - mint
     action: edit
-    namespace: Mint
+    namespace: Drop
   mintRandomQueuedToDrop:
     object:
       - input
