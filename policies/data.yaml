@@ -289,3 +289,27 @@ permission:
       - revisionId
     action: edit
     namespace: UpdateHistory
+  switchCollection:
+    object:
+      - input
+      - mint
+    action: edit
+    namespace: Mint
+  queueMintToDrop:
+    object:
+      - input
+      - drop
+    action: edit
+    namespace: Drop
+  mintQueued:
+    object:
+      - input
+      - mint
+    action: edit
+    namespace: Mint
+  mintRandomQueuedToDrop:
+    object:
+      - input
+      - drop
+    action: edit
+    namespace: Drop
