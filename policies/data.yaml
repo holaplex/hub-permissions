@@ -313,3 +313,9 @@ permission:
       - drop
     action: edit
     namespace: Drop
+  mintRandomQueuedToDropBatched:
+    object:
+      - input
+      - drop
+    action: edit
+    namespace: Drop
